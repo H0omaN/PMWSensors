@@ -14,331 +14,298 @@ from scipy.interpolate import interp1d
 import numpy.ma as ma
 from operator import truediv
 
-
-class Pixel:
-  def __init__(self, ID, Bias,Intensity,Quantile,QualityIndex,RBias):
-      self.ID = ID
-      self.Bias = Bias
-      self.Intensity=Intensity
-      self.Quantile=Quantile
-      self.QualityIndex=QualityIndex
-      self.RBias=RBias
-
-# Netcdf file mode outputs
-outputfolder="/home/z5194283/hdrive/MET_Tutorial/MyData/RealData/ModeOutPut-Modified/"
-outpufiles=glob.glob(outputfolder+"*_obj.nc")
-outpufiles.sort() 
-# TXT mode outputs
-txtoutputfiles=glob.glob(outputfolder+"*_obj.txt")
-txtoutputfiles.sort()
-# input IMERG and MRMS files
-folder="/home/z5194283/hdrive/MET_Tutorial/MyData/RealData/FinalData/Sample/"
-IMERG_files=glob.glob(folder+"IMERG-Comprehensive/*.nc")
-IMERG_files.sort()  
-MRMS_files=glob.glob(folder+"MRMS-Regridded/*.nc")
-MRMS_files.sort()  
-########################
-#Filtering the Hurricane by using Mask created by MODE
-
-i=0
-B=list()
-S=list()
-I=list()
-
-# For Quantile Approach
-Pixellist=list()
-I90_MRMS=list()
-I90_IMERG=list()
-I99_IMERG=list()
-I50_MRMS=list()
-I50_IMERG=list()
-I10_MRMS=list()
-I10_IMERG=list()
-I90_IMERG_SensorID=list()
-I99_IMERG_SensorID=list()
-I99_locations=list()
-IQ_IMERG=list()
-IQ_MRMS=list()
-IQ_IMERG_SensorID=list()
-MEQI99_MRMS=list()
-
-IMERG=list()
-MRMS=list()
-Sensor=list()
-IMERGCentroidX=list()
-IMERGCentroidY=list()
-MRMSCentroidX=list()
-MRMSCentroidY=list()
-
-ACC_IMERG=list()
-ACC_MRMS=list()
-ACC_Sensor=list()
-
-
-
-# Defining a matrix for recording number of evets in each pixel in order to take the best pixels:
-NoE=np.zeros((148, 183))
-
-# For Pixel by Pixel Approach
-Pixellist0=list()
-
-
-for file in  outpufiles:
-    
-    # extracting centorid of each cluster
-    filez=txtoutputfiles[i]    
-    table = pd.read_table(filez, delim_whitespace=True)  
-#    print(table["OBJECT_ID"].values[-2])
-    ICX = table["CENTROID_X"].values[-3]
-    MCX = table["CENTROID_X"].values[-2]
-    MRMSCentroidX.append(MCX)
-    IMERGCentroidX.append(ICX)
-    ICY = table["CENTROID_Y"].values[-3]
-    MCY = table["CENTROID_Y"].values[-2]
-    MRMSCentroidY.append(MCY)
-    IMERGCentroidY.append(ICY)    
-    Modeoutput = Dataset(file, 'r')
-    IMERGMask=Modeoutput.variables['fcst_clus_id'][:,:] 
-    
-    # Isolating the main cluster
-    IMERGMask[IMERGMask<0]=0
-    IMERGMask[IMERGMask>1]=0
-    MRMSMask=Modeoutput.variables['obs_clus_id'][:,:]
-    MRMSMask[MRMSMask<0]=0
-    MRMSMask[MRMSMask>1]=0
-    IMERGfile = Dataset(IMERG_files[i], 'r')
-    SensorType=IMERGfile.variables['HQprecipSource'][:,:]
-    SensorType[SensorType<0]=0
-    IMERGData=IMERGfile.variables['precipitationCal'][:,:] 
-    IMERGData[IMERGData<0]=0
-    QIData=IMERGfile.variables['precipitationQualityIndex'][:,:] 
-    QIData[QIData<0]=0
-    MRMSfile = Dataset(MRMS_files[i], 'r')
-    MRMSData=MRMSfile.variables['PrecipRate_0mabovemeansealevel'][0,:,:]
-    MRMSData[MRMSData<0]=0
-    MRMSFiltered=np.multiply(MRMSData, MRMSMask)   
-    IMERGFiltered=np.multiply(np.transpose(IMERGData), IMERGMask)     
-    SensorTypeFiltered=np.multiply(np.transpose(SensorType), IMERGMask) 
-    QIFiltered=np.multiply(np.transpose(QIData), IMERGMask)
-    QI1=ma.getdata(QIFiltered)
-    S1=ma.getdata(SensorTypeFiltered)
-    Sensor.append(S1)
-    I1=ma.getdata(IMERGFiltered) 
-    IMERG.append(I1)
-    M1=ma.getdata(MRMSFiltered)
-    MRMS.append(M1)   
-    
-    
-    ### Accumulated Precip. for IMERG and MRMS ... Sensor is the highest value 
-    ACC_IMERG.append(np.sum(I1)/np.size(I1))
-    ACC_MRMS.append(np.sum(M1)/np.size(M1))
-    if i==23:
-        stop=1
-    ACC_Sensor.append(np.max(S1))
-
-    
-    
-               
-    # reshaping 2d to 1d and filtering zero values
-    M=list()
-    rows=len(M1)
-    cols=len(M1[0])
-    for ii in range(rows):
-        for jj in range(cols):
-            if M1[ii][jj] > 0:
-                M.append(M1[ii][jj])
-      
-    I=list()
-    B=list()
-    S=list()
-    QI=list()
-    rows=len(I1)
-    cols=len(I1[0])
-    Pixellist00=list()
-    for ii in range(rows):
-        for jj in range(cols):
-            if I1[ii][jj] > 0:  
-                
-                
-
-                I.append(I1[ii][jj])
-                S.append(S1[ii][jj])
-                B.append(M1[ii][jj]-I1[ii][jj])
-                QI.append(QI1[ii][jj])
-                Pixellist00.append(Pixel(S1[ii][jj],M1[ii][jj]-I1[ii][jj],I1[ii][jj],1,QI1[ii][jj],(M1[ii][jj]-I1[ii][jj])/I1[ii][jj]))
-         
-    ###### this matrix show the number of events in each pixel (NOE) 
+#
+#class Pixel:
+#  def __init__(self, ID, Bias,Intensity,Quantile,QualityIndex,RBias):
+#      self.ID = ID
+#      self.Bias = Bias
+#      self.Intensity=Intensity
+#      self.Quantile=Quantile
+#      self.QualityIndex=QualityIndex
+#      self.RBias=RBias
+#
+## Netcdf file mode outputs
+#outputfolder="/home/ho0man/Temp/modeoutputs/ModeOutPut-Modified/"
+#outpufiles=glob.glob(outputfolder+"*_obj.nc")
+#outpufiles.sort() 
+## TXT mode outputs
+#txtoutputfiles=glob.glob(outputfolder+"*_obj.txt")
+#txtoutputfiles.sort()
+## input IMERG and MRMS files
+#folder="/home/ho0man/Temp/modeoutputs/Sample/"
+#IMERG_files=glob.glob(folder+"IMERG-Comprehensive/*.nc")
+#IMERG_files.sort()  
+#MRMS_files=glob.glob(folder+"MRMS-Regridded/*.nc")
+#MRMS_files.sort()  
+#########################
+##Filtering the Hurricane by using Mask created by MODE
+#
+#i=0
+#B=list()
+#S=list()
+#I=list()
+#
+## For Quantile Approach
+#Pixellist=list()
+#I90_MRMS=list()
+#I90_IMERG=list()
+#I99_IMERG=list()
+#I50_MRMS=list()
+#I50_IMERG=list()
+#I10_MRMS=list()
+#I10_IMERG=list()
+#I90_IMERG_SensorID=list()
+#I99_IMERG_SensorID=list()
+#I99_locations=list()
+#IQ_IMERG=list()
+#IQ_MRMS=list()
+#IQ_IMERG_SensorID=list()
+#MEQI99_MRMS=list()
+#
+#IMERG=list()
+#MRMS=list()
+#Sensor=list()
+#IMERGCentroidX=list()
+#IMERGCentroidY=list()
+#MRMSCentroidX=list()
+#MRMSCentroidY=list()
+#
+#ACC_IMERG=list()
+#ACC_MRMS=list()
+#ACC_Sensor=list()
+#
+## Defining a matrix for recording number of evets in each pixel in order to take the best pixels:
+#NoE=np.zeros((148, 183))
+#
+## For Pixel by Pixel Approach
+#Pixellist0=list()
+#
+#
+#for file in  outpufiles:
+#    
+#    # extracting centorid of each cluster
+#    filez=txtoutputfiles[i]    
+#    table = pd.read_table(filez, delim_whitespace=True)  
+##    print(table["OBJECT_ID"].values[-2])
+#    ICX = table["CENTROID_X"].values[-3]
+#    MCX = table["CENTROID_X"].values[-2]
+#    MRMSCentroidX.append(MCX)
+#    IMERGCentroidX.append(ICX)
+#    ICY = table["CENTROID_Y"].values[-3]
+#    MCY = table["CENTROID_Y"].values[-2]
+#    MRMSCentroidY.append(MCY)
+#    IMERGCentroidY.append(ICY)    
+#    Modeoutput = Dataset(file, 'r')
+#    IMERGMask=Modeoutput.variables['fcst_clus_id'][:,:] 
+#    
+#    # Isolating the main cluster
+#    IMERGMask[IMERGMask<0]=0
+#    IMERGMask[IMERGMask>1]=0
+#    MRMSMask=Modeoutput.variables['obs_clus_id'][:,:]
+#    MRMSMask[MRMSMask<0]=0
+#    MRMSMask[MRMSMask>1]=0
+#    IMERGfile = Dataset(IMERG_files[i], 'r')
+#    SensorType=IMERGfile.variables['HQprecipSource'][:,:]
+#    SensorType[SensorType<0]=0
+#    IMERGData=IMERGfile.variables['precipitationCal'][:,:] 
+#    IMERGData[IMERGData<0]=0
+#    QIData=IMERGfile.variables['precipitationQualityIndex'][:,:] 
+#    QIData[QIData<0]=0
+#    MRMSfile = Dataset(MRMS_files[i], 'r')
+#    MRMSData=MRMSfile.variables['PrecipRate_0mabovemeansealevel'][0,:,:]
+#    MRMSData[MRMSData<0]=0
+#    MRMSFiltered=np.multiply(MRMSData, MRMSMask)   
+#    IMERGFiltered=np.multiply(np.transpose(IMERGData), IMERGMask)     
+#    SensorTypeFiltered=np.multiply(np.transpose(SensorType), IMERGMask) 
+#    QIFiltered=np.multiply(np.transpose(QIData), IMERGMask)
+#    QI1=ma.getdata(QIFiltered)
+#    S1=ma.getdata(SensorTypeFiltered)
+#    Sensor.append(S1)
+#    I1=ma.getdata(IMERGFiltered) 
+#    IMERG.append(I1)
+#    M1=ma.getdata(MRMSFiltered)
+#    MRMS.append(M1)   
+#    
+#    
+#    ### Accumulated Precip. for IMERG and MRMS ... Sensor is the highest value 
+#    ACC_IMERG.append(np.sum(I1)/np.size(I1))
+#    ACC_MRMS.append(np.sum(M1)/np.size(M1))
+#    ACC_Sensor.append(np.max(S1))
+#
+#    
+#    
+#               
+#    # reshaping 2d to 1d and filtering zero values
+#    M=list()
+#    rows=len(M1)
+#    cols=len(M1[0])
+#    for ii in range(rows):
+#        for jj in range(cols):
+#            if M1[ii][jj] > 0:
+#                M.append(M1[ii][jj])
+#      
+#    I=list()
+#    B=list()
+#    S=list()
+#    QI=list()
+#    rows=len(I1)
+#    cols=len(I1[0])
+#    Pixellist00=list()
+#    for ii in range(rows):
+#        for jj in range(cols):
+#            if I1[ii][jj] > 0:  
+#                
+#                
+#
+#                I.append(I1[ii][jj])
+#                S.append(S1[ii][jj])
+#                B.append(M1[ii][jj]-I1[ii][jj])
+#                QI.append(QI1[ii][jj])
+#                Pixellist00.append(Pixel(S1[ii][jj],M1[ii][jj]-I1[ii][jj],I1[ii][jj],1,QI1[ii][jj],(M1[ii][jj]-I1[ii][jj])/I1[ii][jj]))
+#         
+#    ##### this matrix show the number of events in each pixel (NOE) 
 #    for ii in range(rows):
 #        for jj in range(cols):        
 #            if I1[ii][jj] > np.quantile(I,0.7):
 #                NoE[ii][jj]=NoE[ii][jj]+1        
-    
-    
-    
-    # Combining the IMERG data and Sensors ID together
-    IS_Combined=list()
-    IS_Combined= np.vstack((S, I))
-    
-    # The process of sorting and ranking of IMERG and MRMS product
-    I_df = pd.DataFrame(IS_Combined[1], columns=['a'])
-    
-    # sort it by the desired series and caculate the percentile
-    sI_df = I_df.sort_values('a').reset_index()
-    sI_df['b'] = sI_df.index / float(len(sI_df) - 1)
-    
-    # setup the interpolator using the value as the index
-    I_interp = interp1d(sI_df['a'], sI_df['b'])      
-    M_df = pd.DataFrame(M, columns=['a'])
-    
-    # sort it by the desired series and caculate the percentile
-    sM_df = M_df.sort_values('a').reset_index()
-    sM_df['b'] = sM_df.index / float(len(sM_df) - 1)
-    
-    # setup the interpolator using the value as the index
-    M_interp = interp1d(sM_df['a'], sM_df['b'])   
-    
-    # finding the third smallest and biggest value of MRMS to filter outliers
-    s = set(M) # used to convert any of the list/tuple to the distinct element and sorted sequence of elements
-    
-    # Note: above statement will convert list into sets 
-    M_3rdSmallest=sorted(s)[1]
-    M_3rdBiggest=sorted(s)[-2]
-    
-    # Matching Process:
-    j=0
-    stop=0
-    filefinder=list()
-    Pixellistt=list()
-    for j in range(len(IS_Combined[1])):
-        I_quantile=I_interp(IS_Combined[1][j])        
-        EQ_MRMS=np.quantile(M,I_quantile)
-        if I_quantile<=0.999 and I_quantile>=0.95:# and EQ_MRMS>=M_3rdSmallest and EQ_MRMS<=M_3rdBiggest:         
-            Biass=np.subtract(EQ_MRMS,IS_Combined[1][j])
-            RBiass=np.divide(Biass,IS_Combined[1][j])
-#            if IS_Combined[0][j]==9:
-#                stop=stop+1
-#                filefinder.append(i)
-            # Adding all information of a pixel to Pixel class in order to find all related information to gether:
-            Pixellistt.append(Pixel(IS_Combined[0][j],Biass,IS_Combined[1][j],I_quantile,QI[j],RBiass))
-    print("Reading files No. "+str(i))
-
-    
-    #finding the 90th percentile of precipitation from IMERG, MRMS and Sensor ID:
-   
-    
-    # Finding the closest IMERG value to 99th percentile:
-    IMERGCloseto99=min(I, key=lambda x:abs(x-np.quantile(I,1)))
-    I99_IMERG.append(IMERGCloseto99)
-    I99_IMERG_SensorID.append(max(IS_Combined[0][np.where(IS_Combined[1] == IMERGCloseto99)]))
-    I99_location=np.where(I1 == IMERGCloseto99)
-    I99_locations.append([I99_location[0][0],I99_location[1][0]])
-    
-    # Finding the MRMS value at the same location of I99
-    AllMEQI99_MRMS=M1[I99_location[0],I99_location[1]]
-    MEQI99_MRMS.append(min(AllMEQI99_MRMS))
-    
-    
-#    IMERGCloseto50=min(I, key=lambda x:abs(x-np.quantile(I,0.50)))
-#    I50_IMERG.append(IMERGCloseto50)
-#    IMERGCloseto10=min(I, key=lambda x:abs(x-np.quantile(I,0.10)))
-#    I10_IMERG.append(IMERGCloseto10)
-#    # The same to MRMS
-#    MRMSCloseto90=min(M, key=lambda x:abs(x-np.quantile(M,0.90)))
-#    I90_MRMS.append(MRMSCloseto90)
-#    MRMSCloseto50=min(I, key=lambda x:abs(x-np.quantile(M,0.50)))
-#    I50_MRMS.append(MRMSCloseto50)
-#    MRMSCloseto10=min(I, key=lambda x:abs(x-np.quantile(M,0.10)))
-#    I10_MRMS.append(MRMSCloseto10)
-    
-   
-    
-    #######################################
-    percentile=[0.5,0.10,0.15,0.20,0.25,0.30,0.35,0.40,0.45,0.50,0.55,0.60,0.65,0.70,0.75,0.80,0.85,0.90,0.95,0.99]
-#    percentile=[0.35,0.37,0.39,0.41,0.43,0.45,0.47,0.49,0.51,0.53,0.55,0.57,0.59,0.61,0.63,0.65,0.67,0.69,0.71,0.73]
-#  
-    IQu_IMERG=list()
-    IQu_MRMS=list()
-    IQu_IMERG_SensorID=list()
-    for pe in percentile:
-        IMERGClosetoQu=min(I, key=lambda x:abs(x-np.quantile(I,pe)))
-        IQu_IMERG.append(IMERGClosetoQu)
-        MRMSClosetoQu=min(I, key=lambda x:abs(x-np.quantile(M,pe)))
-        IQu_MRMS.append(MRMSClosetoQu)
-        IQu_IMERG_SensorID.append(max(IS_Combined[0][np.where(IS_Combined[1] == IMERGClosetoQu)]))
-    IQ_IMERG.append(IQu_IMERG)
-    IQ_MRMS.append(IQu_MRMS)
-    IQ_IMERG_SensorID.append(IQu_IMERG_SensorID)
-    ########################################    
-    
-    
-    # Checking if there are two or more different PMW Sensors:
-    DifferentSensorChecker=list()
-    DifferentSensorChecker.append(np.unique(IS_Combined[0][np.where(IS_Combined[1] == IMERGCloseto99)]))
-
-    if len(DifferentSensorChecker)>2:
-        print("There are two sensors")
-                 
-    i=i+1  
-    
-    if i>100:
-        break
-    Pixellist0.append(Pixellist00) 
-    Pixellist.append(Pixellistt) 
-    
-Timestep=np.arange(i) 
-######################
-
+#    
+#    
+#    
+#    # Combining the IMERG data and Sensors ID together
+#    IS_Combined=list()
+#    IS_Combined= np.vstack((S, I))
+#    
+#    # The process of sorting and ranking of IMERG and MRMS product
+#    I_df = pd.DataFrame(IS_Combined[1], columns=['a'])
+#    
+#    # sort it by the desired series and caculate the percentile
+#    sI_df = I_df.sort_values('a').reset_index()
+#    sI_df['b'] = sI_df.index / float(len(sI_df) - 1)
+#    
+#    # setup the interpolator using the value as the index
+#    I_interp = interp1d(sI_df['a'], sI_df['b'])      
+#    M_df = pd.DataFrame(M, columns=['a'])
+#    
+#    # sort it by the desired series and caculate the percentile
+#    sM_df = M_df.sort_values('a').reset_index()
+#    sM_df['b'] = sM_df.index / float(len(sM_df) - 1)
+#    
+#    # setup the interpolator using the value as the index
+#    M_interp = interp1d(sM_df['a'], sM_df['b'])   
+#    
+#    # finding the third smallest and biggest value of MRMS to filter outliers
+#    s = set(M) # used to convert any of the list/tuple to the distinct element and sorted sequence of elements
+#    
+#    # Note: above statement will convert list into sets 
+#    M_3rdSmallest=sorted(s)[1]
+#    M_3rdBiggest=sorted(s)[-2]
+#    
+#    # Matching Process:
+#    j=0
+#    stop=0
+#    filefinder=list()
+#    Pixellistt=list()
+#    for j in range(len(IS_Combined[1])):
+#        I_quantile=I_interp(IS_Combined[1][j])        
+#        EQ_MRMS=np.quantile(M,I_quantile)
+#        if I_quantile<=0.999 and I_quantile>=0.95:# and EQ_MRMS>=M_3rdSmallest and EQ_MRMS<=M_3rdBiggest:         
+#            Biass=np.subtract(EQ_MRMS,IS_Combined[1][j])
+#            RBiass=np.divide(Biass,IS_Combined[1][j])
+##            if IS_Combined[0][j]==9:
+##                stop=stop+1
+##                filefinder.append(i)
+#            # Adding all information of a pixel to Pixel class in order to find all related information to gether:
+#            Pixellistt.append(Pixel(IS_Combined[0][j],Biass,IS_Combined[1][j],I_quantile,QI[j],RBiass))
+#    print("Reading files No. "+str(i))
+#
+#    
+#    #finding the 90th percentile of precipitation from IMERG, MRMS and Sensor ID:
+#   
+#    
+#    # Finding the closest IMERG value to 99th percentile:
+#    IMERGCloseto99=min(I, key=lambda x:abs(x-np.quantile(I,1)))
+#    I99_IMERG.append(IMERGCloseto99)
+#    I99_IMERG_SensorID.append(max(IS_Combined[0][np.where(IS_Combined[1] == IMERGCloseto99)]))
+#    I99_location=np.where(I1 == IMERGCloseto99)
+#    I99_locations.append([I99_location[0][0],I99_location[1][0]])
+#    
+#    # Finding the MRMS value at the same location of I99
+#    AllMEQI99_MRMS=M1[I99_location[0],I99_location[1]]
+#    MEQI99_MRMS.append(min(AllMEQI99_MRMS))
+#    
+#    
+##    IMERGCloseto50=min(I, key=lambda x:abs(x-np.quantile(I,0.50)))
+##    I50_IMERG.append(IMERGCloseto50)
+##    IMERGCloseto10=min(I, key=lambda x:abs(x-np.quantile(I,0.10)))
+##    I10_IMERG.append(IMERGCloseto10)
+##    # The same to MRMS
+##    MRMSCloseto90=min(M, key=lambda x:abs(x-np.quantile(M,0.90)))
+##    I90_MRMS.append(MRMSCloseto90)
+##    MRMSCloseto50=min(I, key=lambda x:abs(x-np.quantile(M,0.50)))
+##    I50_MRMS.append(MRMSCloseto50)
+##    MRMSCloseto10=min(I, key=lambda x:abs(x-np.quantile(M,0.10)))
+##    I10_MRMS.append(MRMSCloseto10)
+#    
+#   
+#    
+#    #######################################
+##    percentile=[0.5,0.10,0.15,0.20,0.25,0.30,0.35,0.40,0.45,0.50,0.55,0.60,0.65,0.70,0.75,0.80,0.85,0.90,0.95,0.99]
+###    percentile=[0.35,0.37,0.39,0.41,0.43,0.45,0.47,0.49,0.51,0.53,0.55,0.57,0.59,0.61,0.63,0.65,0.67,0.69,0.71,0.73]
+###  
+##    IQu_IMERG=list()
+##    IQu_MRMS=list()
+##    IQu_IMERG_SensorID=list()
+##    for pe in percentile:
+##        IMERGClosetoQu=min(I, key=lambda x:abs(x-np.quantile(I,pe)))
+##        IQu_IMERG.append(IMERGClosetoQu)
+##        MRMSClosetoQu=min(I, key=lambda x:abs(x-np.quantile(M,pe)))
+##        IQu_MRMS.append(MRMSClosetoQu)
+##        IQu_IMERG_SensorID.append(max(IS_Combined[0][np.where(IS_Combined[1] == IMERGClosetoQu)]))
+##    IQ_IMERG.append(IQu_IMERG)
+##    IQ_MRMS.append(IQu_MRMS)
+##    IQ_IMERG_SensorID.append(IQu_IMERG_SensorID)
+#    ########################################    
+#    
+#    
+#    # Checking if there are two or more different PMW Sensors:
+#    DifferentSensorChecker=list()
+#    DifferentSensorChecker.append(np.unique(IS_Combined[0][np.where(IS_Combined[1] == IMERGCloseto99)]))
+#
+#    if len(DifferentSensorChecker)>2:
+#        print("There are two sensors")
+#                 
+#    i=i+1  
+#    
+#    if i>100:
+#        break
+#    Pixellist0.append(Pixellist00) 
+#    Pixellist.append(Pixellistt) 
+#    
+#Timestep=np.arange(i) 
+#######################
+#
 ##Plotting the bar chart with percentiles: 
 #PrecentileID=1   
-##plt.subplot(2,1,1)
-##Sen_ID=[QQ[10] for QQ in IQ_IMERG_SensorID]
-##plt.bar(Timestep,Sen_ID)
-##plt.title('PMW Sensors')
-###plt.legend(loc='lower right') 
-##plt.ylabel("Sensor ID")  
-###plt.xlabel("Intensity (mm/hr)")  
-##plt.yticks(np.arange(0, 12, step=1)) 
-##plt.xticks(np.arange(0, 74, step=1))  
-##plt.grid()
-##plt.tight_layout()  
+#plt.subplot(2,1,1)
+#Sen_ID=[QQ[15] for QQ in IQ_IMERG_SensorID]
+#plt.bar(Timestep,Sen_ID)
+#plt.title('PMW Sensors')
+##plt.legend(loc='lower right') 
+#plt.ylabel("Sensor ID")  
+##plt.xlabel("Intensity (mm/hr)")  
+#plt.yticks(np.arange(0, 12, step=1)) 
+#plt.xticks(np.arange(0, 74, step=1))  
+#plt.grid()
+#plt.tight_layout()  
 #
-##plt.subplot(2,1,2)
-#IME=[QQ[9] for QQ in IQ_IMERG]
-#plt.plot(Timestep,IME,label='IMERG-'+str(percentile[10]), lw=3)
+#plt.subplot(2,1,2)
+#IME=[QQ[15] for QQ in IQ_IMERG]
+#plt.plot(Timestep,IME,label='IMERG-'+str(percentile[9]))#, lw=3)
 ##plt.plot(Timestep,I50_IMERG,label='IMERG-95')
 ##plt.plot(Timestep,I10_IMERG,label='IMERG-90')
 #
-#MRM4=[QQ[8] for QQ in IQ_MRMS]
-#plt.plot(Timestep,MRM4,label='MRMS-'+str(percentile[8]))
-#MRM5=[QQ[7] for QQ in IQ_MRMS]
-#plt.plot(Timestep,MRM5,label='MRMS-'+str(percentile[7]))
-#MRM6=[QQ[6] for QQ in IQ_MRMS]
-#plt.plot(Timestep,MRM6,label='MRMS-'+str(percentile[6]))
-#MRM=[QQ[9] for QQ in IQ_MRMS]
+#MRM=[QQ[15] for QQ in IQ_MRMS]
 #plt.plot(Timestep,MRM,label='MRMS-'+str(percentile[9]))
-#MRM1=[QQ[10] for QQ in IQ_MRMS]
-#plt.plot(Timestep,MRM1,label='MRMS-'+str(percentile[10]))
-#MRM2=[QQ[11] for QQ in IQ_MRMS]
-#plt.plot(Timestep,MRM2,label='MRMS-'+str(percentile[11]))
-#MRM3=[QQ[12] for QQ in IQ_MRMS]
-#plt.plot(Timestep,MRM3,label='MRMS-'+str(percentile[12]))
-#
-#MRM4=[QQ[13] for QQ in IQ_MRMS]
-#plt.plot(Timestep,MRM4,label='MRMS-'+str(percentile[13]))
-#MRM5=[QQ[14] for QQ in IQ_MRMS]
-#plt.plot(Timestep,MRM5,label='MRMS-'+str(percentile[14]))
-#MRM6=[QQ[15] for QQ in IQ_MRMS]
-#plt.plot(Timestep,MRM6,label='MRMS-'+str(percentile[15]))
-#MRM=[QQ[16] for QQ in IQ_MRMS]
-#plt.plot(Timestep,MRM,label='MRMS-'+str(percentile[16]))
-#MRM1=[QQ[17] for QQ in IQ_MRMS]
-#plt.plot(Timestep,MRM1,label='MRMS-'+str(percentile[17]))
-#MRM2=[QQ[18] for QQ in IQ_MRMS]
-#plt.plot(Timestep,MRM2,label='MRMS-'+str(percentile[18]))
-#MRM3=[QQ[19] for QQ in IQ_MRMS]
-#plt.plot(Timestep,MRM3,label='MRMS-'+str(percentile[19]))
-#
-#
 ##plt.title('Intensity 90th Precentile')
 #plt.legend(loc='lower right') 
 #plt.ylabel("Intensity (mm/hr)")   
@@ -346,7 +313,7 @@ Timestep=np.arange(i)
 #plt.xticks(np.arange(0, 74, step=1))  
 #plt.grid()
 #plt.tight_layout()  
-##
+#
 #plt.subplot(4,2,2)
 #Sen_ID=[QQ[15] for QQ in IQ_IMERG_SensorID]
 #plt.bar(Timestep,Sen_ID)
@@ -1077,7 +1044,7 @@ for eachmemebrofPixellist in Pixellist0:
 pp=list()
 for ii in range(rows):
     for jj in range(cols):        
-        if NoE[ii][jj] > 20:
+        if NoE[ii][jj] > 10:
             pp.append([ii,jj])
             
             
@@ -1102,11 +1069,11 @@ for ppp in pp:
     MRMnp=list()
     BiasIM=list()
     for i in range(len(IMEnp0)):
-        if IMEnp0[i] !=0 and MRMnp0[i]!=0 and SNS[i]==3:
+        if IMEnp0[i] !=0 and MRMnp0[i]!=0 and SNS[i]==5:
             IMEnp.append(IMEnp0[i])
             MRMnp.append(MRMnp0[i])
             BiasIM.append(IMEnp0[i]-MRMnp0[i])    
-    plt.scatter(IMEnp,MRMnp)#,label='X='+str(XX)+', Y='+str(YY))#, lw=3)
+    plt.scatter(BiasIM,IMEnp)#,label='X='+str(XX)+', Y='+str(YY))#, lw=3)
     
     #plt.title('Intensity 90th Precentile')
 #    plt.legend(loc='upper right') 
@@ -1116,7 +1083,7 @@ for ppp in pp:
     #plt.xticks(np.arange(0, 74, step=1))  
     plt.grid()
     plt.tight_layout()  
-#
+
 #plt.subplot(2,2,2)
 #XX=112
 #YY=126
@@ -1146,7 +1113,7 @@ for ppp in pp:
 #plt.subplot(2,2,3)
 #XX=110
 #YY=132
-#
+
 #
 #IME=[Id[XX][YY] for Id in IMERG]
 #MRM=[Id[XX][YY] for Id in MRMS]
