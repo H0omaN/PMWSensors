@@ -13,7 +13,7 @@ from scipy import stats
 from scipy.interpolate import interp1d
 import numpy.ma as ma
 from operator import truediv
-
+#
 #
 #class Pixel:
 #  def __init__(self, ID, Bias,Intensity,Quantile,QualityIndex,RBias):
@@ -24,15 +24,19 @@ from operator import truediv
 #      self.QualityIndex=QualityIndex
 #      self.RBias=RBias
 #
-## Netcdf file mode outputs
-#outputfolder="/home/ho0man/Temp/modeoutputs/ModeOutPut-Modified/"
+## Netcdf file mode outputs for PC:
+##outputfolder="/home/ho0man/Temp/modeoutputs/ModeOutPut-Modified/"
+## Netcdf file mode outputs for Storms:
+#outputfolder="/home/z5194283/hdrive/MET_Tutorial/MyData/RealData/ModeOutPut-Modified/"
 #outpufiles=glob.glob(outputfolder+"*_obj.nc")
 #outpufiles.sort() 
 ## TXT mode outputs
 #txtoutputfiles=glob.glob(outputfolder+"*_obj.txt")
 #txtoutputfiles.sort()
-## input IMERG and MRMS files
-#folder="/home/ho0man/Temp/modeoutputs/Sample/"
+### input IMERG and MRMS files for PC:
+##folder="/home/ho0man/Temp/modeoutputs/Sample/"
+## input IMERG and MRMS files for Storms:
+#folder="/home/z5194283/hdrive/MET_Tutorial/MyData/RealData/FinalData/Sample/"
 #IMERG_files=glob.glob(folder+"IMERG-Comprehensive/*.nc")
 #IMERG_files.sort()  
 #MRMS_files=glob.glob(folder+"MRMS-Regridded/*.nc")
@@ -44,6 +48,8 @@ from operator import truediv
 #B=list()
 #S=list()
 #I=list()
+#rows=0
+#cols=0
 #
 ## For Quantile Approach
 #Pixellist=list()
@@ -111,9 +117,12 @@ from operator import truediv
 #    IMERGData[IMERGData<0]=0
 #    QIData=IMERGfile.variables['precipitationQualityIndex'][:,:] 
 #    QIData[QIData<0]=0
+##    IRonly=IMERGfile.variables['IRprecipitation'][:,:] 
+##    IRonly[IRonly<0]=0
 #    MRMSfile = Dataset(MRMS_files[i], 'r')
 #    MRMSData=MRMSfile.variables['PrecipRate_0mabovemeansealevel'][0,:,:]
 #    MRMSData[MRMSData<0]=0
+#
 #    MRMSFiltered=np.multiply(MRMSData, MRMSMask)   
 #    IMERGFiltered=np.multiply(np.transpose(IMERGData), IMERGMask)     
 #    SensorTypeFiltered=np.multiply(np.transpose(SensorType), IMERGMask) 
@@ -166,7 +175,7 @@ from operator import truediv
 #    ##### this matrix show the number of events in each pixel (NOE) 
 #    for ii in range(rows):
 #        for jj in range(cols):        
-#            if I1[ii][jj] > np.quantile(I,0.7):
+#            if I1[ii][jj] > np.quantile(I,0.5):
 #                NoE[ii][jj]=NoE[ii][jj]+1        
 #    
 #    
@@ -1043,8 +1052,9 @@ for eachmemebrofPixellist in Pixellist0:
     
 pp=list()
 for ii in range(rows):
+    print('one row has completed')
     for jj in range(cols):        
-        if NoE[ii][jj] > 10:
+        if NoE[ii][jj] > 40:
             pp.append([ii,jj])
             
             
@@ -1055,34 +1065,96 @@ for ii in range(rows):
 #plt.subplot(2,2,1)
 #XX=95
 #YY=126
-for ppp in pp:
-    XX=ppp[0]
-    YY=ppp[1]
-    IME=[Id[XX][YY] for Id in IMERG]
-    MRM=[Id[XX][YY] for Id in MRMS]
-    SNS=[Id[XX][YY] for Id in Sensor]
-    
-    IMEnp0=np.asarray(IME, dtype=np.float32)
-    MRMnp0=np.asarray(MRM, dtype=np.float32)
-    #Filtering Zero-Value pixels in both IMERG and MRMS 
-    IMEnp=list()
-    MRMnp=list()
-    BiasIM=list()
-    for i in range(len(IMEnp0)):
-        if IMEnp0[i] !=0 and MRMnp0[i]!=0 and SNS[i]==5:
-            IMEnp.append(IMEnp0[i])
-            MRMnp.append(MRMnp0[i])
-            BiasIM.append(IMEnp0[i]-MRMnp0[i])    
-    plt.scatter(BiasIM,IMEnp)#,label='X='+str(XX)+', Y='+str(YY))#, lw=3)
-    
-    #plt.title('Intensity 90th Precentile')
+            
+###### Plotting scatters for each with sensor classification:
+           
+IMEnp=list()
+MRMnp=list()
+BiasIM=list()   
+
+IMEnpS0=list()
+MRMnpS0=list()
+BiasIMS0=list()    
+IMEnpS3=list()
+MRMnpS3=list()
+BiasIMS3=list()   
+IMEnpS5=list()
+MRMnpS5=list()
+BiasIMS5=list()   
+IMEnpS7=list()
+MRMnpS7=list()
+BiasIMS7=list()   
+IMEnpS9=list()
+MRMnpS9=list()
+BiasIMS9=list()   
+IMEnpS11=list()
+MRMnpS11=list()
+BiasIMS11=list()      
+
+for nnn in range(len(IMERG)):
+    IMEnp0=np.asarray(IMERG[nnn], dtype=np.float32)
+    MRMnp0=np.asarray(MRMS[nnn], dtype=np.float32)
+    SNnp0=np.asarray(Sensor[nnn], dtype=np.float32)
+    for ppp in pp:
+        XX=ppp[0]
+        YY=ppp[1]  
+
+        #Filtering Zero-Value pixels in both IMERG and MRMS and Filtering Sensros
+        if IMEnp0[XX][YY] !=0 and MRMnp0[XX][YY]!=0 and SNnp0[XX][YY]==0:
+            IMEnpS0.append(IMEnp0[XX][YY])
+            MRMnpS0.append(MRMnp0[XX][YY])
+            BiasIMS0.append(IMEnp0[XX][YY]-MRMnp0[XX][YY])   
+            
+            
+        #Filtering Zero-Value pixels in both IMERG and MRMS and Filtering Sensros
+        if IMEnp0[XX][YY] !=0 and MRMnp0[XX][YY]!=0 and SNnp0[XX][YY]==3:
+            IMEnpS3.append(IMEnp0[XX][YY])
+            MRMnpS3.append(MRMnp0[XX][YY])
+            BiasIMS3.append(IMEnp0[XX][YY]-MRMnp0[XX][YY])   
+        
+
+        #Filtering Zero-Value pixels in both IMERG and MRMS and Filtering Sensros
+        if IMEnp0[XX][YY] !=0 and MRMnp0[XX][YY]!=0 and SNnp0[XX][YY]==5:
+            IMEnpS5.append(IMEnp0[XX][YY])
+            MRMnpS5.append(MRMnp0[XX][YY])
+            BiasIMS5.append(IMEnp0[XX][YY]-MRMnp0[XX][YY])   
+
+
+        #Filtering Zero-Value pixels in both IMERG and MRMS and Filtering Sensros
+        if IMEnp0[XX][YY] !=0 and MRMnp0[XX][YY]!=0 and SNnp0[XX][YY]==7:
+            IMEnpS7.append(IMEnp0[XX][YY])
+            MRMnpS7.append(MRMnp0[XX][YY])
+            BiasIMS7.append(IMEnp0[XX][YY]-MRMnp0[XX][YY])   
+
+
+
+        #Filtering Zero-Value pixels in both IMERG and MRMS and Filtering Sensros
+        if IMEnp0[XX][YY] !=0 and MRMnp0[XX][YY]!=0 and SNnp0[XX][YY]==9:
+            IMEnpS9.append(IMEnp0[XX][YY])
+            MRMnpS9.append(MRMnp0[XX][YY])
+            BiasIMS9.append(IMEnp0[XX][YY]-MRMnp0[XX][YY])   
+
+
+        #Filtering Zero-Value pixels in both IMERG and MRMS and Filtering Sensros
+        if IMEnp0[XX][YY] !=0 and MRMnp0[XX][YY]!=0 and SNnp0[XX][YY]==11:
+            IMEnpS11.append(IMEnp0[XX][YY])
+            MRMnpS11.append(MRMnp0[XX][YY])
+            BiasIMS11.append(IMEnp0[XX][YY]-MRMnp0[XX][YY])  
+
+plt.scatter(IMEnpS0,BiasIMS0)#,label='X='+str(XX)+', Y='+str(YY))#, lw=3)
+plt.scatter(IMEnpS3,BiasIMS3)
+plt.scatter(IMEnpS5,BiasIMS5)
+plt.scatter(IMEnpS7,BiasIMS7)
+plt.scatter(IMEnpS9,BiasIMS9)
+plt.scatter(IMEnpS11,BiasIMS11)
+#plt.title('Intensity 90th Precentile')
 #    plt.legend(loc='upper right') 
-    plt.ylabel("MRMS")# (IMERG-MRMS) (mm/hr)")   
-    plt.xlabel("IMERG Intensity (mm/hr)")  
-    #plt.yticks(np.arange(-60, 100, step=20))  
-    #plt.xticks(np.arange(0, 74, step=1))  
-    plt.grid()
-    plt.tight_layout()  
+plt.ylabel("Bias")# (IMERG-MRMS) (mm/hr)")   
+plt.xlabel("IMERG Intensity (mm/hr)")  
+#plt.yticks(np.arange(-60, 100, step=20))  
+#plt.xticks(np.arange(0, 74, step=1))  
+plt.grid()
+plt.tight_layout()  
 
 #plt.subplot(2,2,2)
 #XX=112
