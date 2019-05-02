@@ -1054,7 +1054,7 @@ pp=list()
 for ii in range(rows):
     print('one row has completed')
     for jj in range(cols):        
-        if NoE[ii][jj] > 40:
+        if NoE[ii][jj] > 0:
             pp.append([ii,jj])
             
             
@@ -1098,6 +1098,7 @@ for nnn in range(len(IMERG)):
     for ppp in pp:
         XX=ppp[0]
         YY=ppp[1]  
+      
 
         #Filtering Zero-Value pixels in both IMERG and MRMS and Filtering Sensros
         if IMEnp0[XX][YY] !=0 and MRMnp0[XX][YY]!=0 and SNnp0[XX][YY]==0:
@@ -1141,15 +1142,15 @@ for nnn in range(len(IMERG)):
             MRMnpS11.append(MRMnp0[XX][YY])
             BiasIMS11.append(IMEnp0[XX][YY]-MRMnp0[XX][YY])  
 
-plt.scatter(IMEnpS0,BiasIMS0)#,label='X='+str(XX)+', Y='+str(YY))#, lw=3)
-plt.scatter(IMEnpS3,BiasIMS3)
-plt.scatter(IMEnpS5,BiasIMS5)
-plt.scatter(IMEnpS7,BiasIMS7)
-plt.scatter(IMEnpS9,BiasIMS9)
-plt.scatter(IMEnpS11,BiasIMS11)
+plt.scatter(IMEnpS0,MRMnpS0,label='Sensor 0', s=1)#, lw=3)
+plt.scatter(IMEnpS3,MRMnpS3,label='Sensor 3', s=1)
+plt.scatter(IMEnpS5,MRMnpS5,label='Sensor 5', s=1)
+plt.scatter(IMEnpS7,MRMnpS7,label='Sensor 7', s=1)
+plt.scatter(IMEnpS9,MRMnpS9,label='Sensor 9', s=1)
+plt.scatter(IMEnpS11,MRMnpS11,label='Sensor 11', s=1)
 #plt.title('Intensity 90th Precentile')
-#    plt.legend(loc='upper right') 
-plt.ylabel("Bias")# (IMERG-MRMS) (mm/hr)")   
+plt.legend(loc='upper right') 
+plt.ylabel("MRMS")# (IMERG-MRMS) (mm/hr)")   
 plt.xlabel("IMERG Intensity (mm/hr)")  
 #plt.yticks(np.arange(-60, 100, step=20))  
 #plt.xticks(np.arange(0, 74, step=1))  
