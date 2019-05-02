@@ -13,7 +13,7 @@ from scipy import stats
 from scipy.interpolate import interp1d
 import numpy.ma as ma
 from operator import truediv
-#
+##
 #
 #class Pixel:
 #  def __init__(self, ID, Bias,Intensity,Quantile,QualityIndex,RBias):
@@ -25,18 +25,18 @@ from operator import truediv
 #      self.RBias=RBias
 #
 ## Netcdf file mode outputs for PC:
-##outputfolder="/home/ho0man/Temp/modeoutputs/ModeOutPut-Modified/"
+#outputfolder="/home/ho0man/Temp/modeoutputs/ModeOutPut-Modified/"
 ## Netcdf file mode outputs for Storms:
-#outputfolder="/home/z5194283/hdrive/MET_Tutorial/MyData/RealData/ModeOutPut-Modified/"
+##outputfolder="/home/z5194283/hdrive/MET_Tutorial/MyData/RealData/ModeOutPut-Modified/"
 #outpufiles=glob.glob(outputfolder+"*_obj.nc")
 #outpufiles.sort() 
 ## TXT mode outputs
 #txtoutputfiles=glob.glob(outputfolder+"*_obj.txt")
 #txtoutputfiles.sort()
 ### input IMERG and MRMS files for PC:
-##folder="/home/ho0man/Temp/modeoutputs/Sample/"
+#folder="/home/ho0man/Temp/modeoutputs/Sample/"
 ## input IMERG and MRMS files for Storms:
-#folder="/home/z5194283/hdrive/MET_Tutorial/MyData/RealData/FinalData/Sample/"
+##folder="/home/z5194283/hdrive/MET_Tutorial/MyData/RealData/FinalData/Sample/"
 #IMERG_files=glob.glob(folder+"IMERG-Comprehensive/*.nc")
 #IMERG_files.sort()  
 #MRMS_files=glob.glob(folder+"MRMS-Regridded/*.nc")
@@ -175,7 +175,7 @@ from operator import truediv
 #    ##### this matrix show the number of events in each pixel (NOE) 
 #    for ii in range(rows):
 #        for jj in range(cols):        
-#            if I1[ii][jj] > np.quantile(I,0.5):
+#            if I1[ii][jj] > np.quantile(I,0.9):
 #                NoE[ii][jj]=NoE[ii][jj]+1        
 #    
 #    
@@ -405,199 +405,199 @@ from operator import truediv
 #plt.tight_layout()  
 ##
 
-
-listRBT=list()
-listRB0=list()
-listRB5=list()
-listRB7=list()
-listRB11=list()
-listRB9=list()
-listRB3=list()
-
-listBT=list()
-listB0=list()
-listB5=list()
-listB7=list()
-listB11=list()
-listB9=list()
-listB3=list()
-
-listIT=list()
-listI0=list()
-listI5=list()
-listI7=list()
-listI11=list()
-listI9=list()
-listI3=list()
-
-listQT=list()
-listQ5=list()
-listQ0=list()
-listQ7=list()
-listQ9=list()
-listQ11=list()
-listQ3=list()
-
-listQIT=list()
-listQI5=list()
-listQI0=list()
-listQI7=list()
-listQI9=list()
-listQI11=list()
-listQI3=list()
-
-#i=0
-#for member in B:
-#    if S[i]==0:
-#        B0.append(B[i])
-#        I0.append(I[i])
-#    if S[i]==5:
-#        B5.append(B[i])
-#        I5.append(I[i])
-#    if S[i]==7:
-#        B7.append(B[i]) 
-#        I7.append(I[i])
-#    if S[i]==11:
-#        B11.append(B[i])
-#        I11.append(I[i])
-#    if S[i]==9:
-#        B9.append(B[i])  
-#        I9.append(I[i])
-#    i=i+1
-#    print("Creating Bias lists No. "+str(i))
-
-k=0
-## For just Pixel by Pixel plotting ... it should be commented when you want to plot quantile outputs
-for eachmemebrofPixellist in Pixellist0:
-## For just Quantile plotting ... it should be commented when you want to plot Pixel by Pixel outputs
-#for eachmemebrofPixellist in Pixellist:
-    
-    RBT=list()
-    RB0=list()
-    RB5=list()
-    RB7=list()
-    RB11=list()
-    RB9=list()
-    RB3=list()
-    
-    BT=list()
-    B0=list()
-    B5=list()
-    B7=list()
-    B11=list()
-    B9=list()
-    B3=list()
-    
-    IT=list()
-    I0=list()
-    I5=list()
-    I7=list()
-    I11=list()
-    I9=list()
-    I3=list()
-    
-    QT=list()
-    Q5=list()
-    Q0=list()
-    Q7=list()
-    Q9=list()
-    Q11=list()
-    Q3=list()
-    
-    QIT=list()
-    QI5=list()
-    QI0=list()
-    QI7=list()
-    QI9=list()
-    QI11=list()
-    QI3=list()
-    
-
-    for member in eachmemebrofPixellist:
-        RBT.append(member.RBias)
-        BT.append(member.Bias)
-        IT.append(member.Intensity)
-        QT.append(member.Quantile)
-        QIT.append(member.QualityIndex)    
-        if member.ID==0:
-            RB0.append(member.RBias)
-            B0.append(member.Bias)
-            I0.append(member.Intensity)
-            Q0.append(member.Quantile)
-            QI0.append(member.QualityIndex)
-        if member.ID==5:
-            RB5.append(member.RBias)
-            B5.append(member.Bias)
-            I5.append(member.Intensity)
-            Q5.append(member.Quantile)
-            QI5.append(member.QualityIndex)
-        if member.ID==7:
-            RB7.append(member.RBias)
-            B7.append(member.Bias)  
-            I7.append(member.Intensity)
-            Q7.append(member.Quantile)
-            QI7.append(member.QualityIndex)
-        if member.ID==11:
-            RB11.append(member.RBias)
-            B11.append(member.Bias)
-            I11.append(member.Intensity)
-            Q11.append(member.Quantile)
-            QI11.append(member.QualityIndex)
-        if member.ID==9:
-            RB9.append(member.RBias)
-            B9.append(member.Bias)  
-            I9.append(member.Intensity)
-            Q9.append(member.Quantile)
-            QI9.append(member.QualityIndex)
-        if member.ID==3:
-            RB3.append(member.RBias)
-            B3.append(member.Bias)  
-            I3.append(member.Intensity)
-            Q3.append(member.Quantile)
-            QI3.append(member.QualityIndex)
-        k=k+1
-#        print("Creating Bias lists No. "+str(k))
-    
-    listRBT.append(RBT)
-    listRB0.append(RB0)
-    listRB5.append(RB5)
-    listRB7.append(RB7)
-    listRB11.append(RB11)
-    listRB9.append(RB9)
-    listRB3.append(RB3)
-        
-    listBT.append(BT)
-    listB0.append(B0)
-    listB5.append(B5)
-    listB7.append(B7)
-    listB11.append(B11)
-    listB9.append(B9)
-    listB3.append(B3)
-    
-    listIT.append(IT)
-    listI0.append(I0)
-    listI5.append(I5)
-    listI7.append(I7)
-    listI11.append(I11)
-    listI9.append(I9)
-    listI3.append(I3)
-    
-    listQT.append(QT)
-    listQ5.append(Q5)
-    listQ0.append(Q0)
-    listQ7.append(Q7)
-    listQ9.append(Q9)
-    listQ11.append(Q11)
-    listQ3.append(Q3)
-    
-    listQIT.append(QIT)
-    listQI5.append(QI5)
-    listQI0.append(QI0)
-    listQI7.append(QI7)
-    listQI9.append(QI9)
-    listQI11.append(QI11)
-    listQI3.append(QI3)
-    
+#
+#listRBT=list()
+#listRB0=list()
+#listRB5=list()
+#listRB7=list()
+#listRB11=list()
+#listRB9=list()
+#listRB3=list()
+#
+#listBT=list()
+#listB0=list()
+#listB5=list()
+#listB7=list()
+#listB11=list()
+#listB9=list()
+#listB3=list()
+#
+#listIT=list()
+#listI0=list()
+#listI5=list()
+#listI7=list()
+#listI11=list()
+#listI9=list()
+#listI3=list()
+#
+#listQT=list()
+#listQ5=list()
+#listQ0=list()
+#listQ7=list()
+#listQ9=list()
+#listQ11=list()
+#listQ3=list()
+#
+#listQIT=list()
+#listQI5=list()
+#listQI0=list()
+#listQI7=list()
+#listQI9=list()
+#listQI11=list()
+#listQI3=list()
+#
+##i=0
+##for member in B:
+##    if S[i]==0:
+##        B0.append(B[i])
+##        I0.append(I[i])
+##    if S[i]==5:
+##        B5.append(B[i])
+##        I5.append(I[i])
+##    if S[i]==7:
+##        B7.append(B[i]) 
+##        I7.append(I[i])
+##    if S[i]==11:
+##        B11.append(B[i])
+##        I11.append(I[i])
+##    if S[i]==9:
+##        B9.append(B[i])  
+##        I9.append(I[i])
+##    i=i+1
+##    print("Creating Bias lists No. "+str(i))
+#
+#k=0
+### For just Pixel by Pixel plotting ... it should be commented when you want to plot quantile outputs
+#for eachmemebrofPixellist in Pixellist0:
+### For just Quantile plotting ... it should be commented when you want to plot Pixel by Pixel outputs
+##for eachmemebrofPixellist in Pixellist:
+#    
+#    RBT=list()
+#    RB0=list()
+#    RB5=list()
+#    RB7=list()
+#    RB11=list()
+#    RB9=list()
+#    RB3=list()
+#    
+#    BT=list()
+#    B0=list()
+#    B5=list()
+#    B7=list()
+#    B11=list()
+#    B9=list()
+#    B3=list()
+#    
+#    IT=list()
+#    I0=list()
+#    I5=list()
+#    I7=list()
+#    I11=list()
+#    I9=list()
+#    I3=list()
+#    
+#    QT=list()
+#    Q5=list()
+#    Q0=list()
+#    Q7=list()
+#    Q9=list()
+#    Q11=list()
+#    Q3=list()
+#    
+#    QIT=list()
+#    QI5=list()
+#    QI0=list()
+#    QI7=list()
+#    QI9=list()
+#    QI11=list()
+#    QI3=list()
+#    
+#
+#    for member in eachmemebrofPixellist:
+#        RBT.append(member.RBias)
+#        BT.append(member.Bias)
+#        IT.append(member.Intensity)
+#        QT.append(member.Quantile)
+#        QIT.append(member.QualityIndex)    
+#        if member.ID==0:
+#            RB0.append(member.RBias)
+#            B0.append(member.Bias)
+#            I0.append(member.Intensity)
+#            Q0.append(member.Quantile)
+#            QI0.append(member.QualityIndex)
+#        if member.ID==5:
+#            RB5.append(member.RBias)
+#            B5.append(member.Bias)
+#            I5.append(member.Intensity)
+#            Q5.append(member.Quantile)
+#            QI5.append(member.QualityIndex)
+#        if member.ID==7:
+#            RB7.append(member.RBias)
+#            B7.append(member.Bias)  
+#            I7.append(member.Intensity)
+#            Q7.append(member.Quantile)
+#            QI7.append(member.QualityIndex)
+#        if member.ID==11:
+#            RB11.append(member.RBias)
+#            B11.append(member.Bias)
+#            I11.append(member.Intensity)
+#            Q11.append(member.Quantile)
+#            QI11.append(member.QualityIndex)
+#        if member.ID==9:
+#            RB9.append(member.RBias)
+#            B9.append(member.Bias)  
+#            I9.append(member.Intensity)
+#            Q9.append(member.Quantile)
+#            QI9.append(member.QualityIndex)
+#        if member.ID==3:
+#            RB3.append(member.RBias)
+#            B3.append(member.Bias)  
+#            I3.append(member.Intensity)
+#            Q3.append(member.Quantile)
+#            QI3.append(member.QualityIndex)
+#        k=k+1
+##        print("Creating Bias lists No. "+str(k))
+#    
+#    listRBT.append(RBT)
+#    listRB0.append(RB0)
+#    listRB5.append(RB5)
+#    listRB7.append(RB7)
+#    listRB11.append(RB11)
+#    listRB9.append(RB9)
+#    listRB3.append(RB3)
+#        
+#    listBT.append(BT)
+#    listB0.append(B0)
+#    listB5.append(B5)
+#    listB7.append(B7)
+#    listB11.append(B11)
+#    listB9.append(B9)
+#    listB3.append(B3)
+#    
+#    listIT.append(IT)
+#    listI0.append(I0)
+#    listI5.append(I5)
+#    listI7.append(I7)
+#    listI11.append(I11)
+#    listI9.append(I9)
+#    listI3.append(I3)
+#    
+#    listQT.append(QT)
+#    listQ5.append(Q5)
+#    listQ0.append(Q0)
+#    listQ7.append(Q7)
+#    listQ9.append(Q9)
+#    listQ11.append(Q11)
+#    listQ3.append(Q3)
+#    
+#    listQIT.append(QIT)
+#    listQI5.append(QI5)
+#    listQI0.append(QI0)
+#    listQI7.append(QI7)
+#    listQI9.append(QI9)
+#    listQI11.append(QI11)
+#    listQI3.append(QI3)
+#    
 
 ####Plotting the bar chart with Shifted Random Pixels: 
 ################################################################## 
@@ -1051,6 +1051,7 @@ for eachmemebrofPixellist in Pixellist0:
 ####################################################################
     
 pp=list()
+
 for ii in range(rows):
     print('one row has completed')
     for jj in range(cols):        
@@ -1058,6 +1059,10 @@ for ii in range(rows):
             pp.append([ii,jj])
             
             
+#    for ii in range(rows):
+#        for jj in range(cols):
+#            if M1[ii][jj] > 0:
+#                M.append(M1[ii][jj])           
     
     
     
@@ -1092,37 +1097,53 @@ MRMnpS11=list()
 BiasIMS11=list()      
 
 for nnn in range(len(IMERG)):
+    print(str(nnn))
+    
     IMEnp0=np.asarray(IMERG[nnn], dtype=np.float32)
     MRMnp0=np.asarray(MRMS[nnn], dtype=np.float32)
     SNnp0=np.asarray(Sensor[nnn], dtype=np.float32)
+    
+    #reshaping 2d IMERG at each time step to 1d to calculate the favorite quantile using np.quantile
+    IMERG_1d=list()
+    for ii in range(rows):
+    
+        for jj in range(cols): 
+            if IMEnp0[ii][jj]>0:
+                IMERG_1d.append(IMEnp0[ii][jj])
+    # get the sensor at back and forward timestep
+    if nnn !=0:
+        SNnplast=np.asarray(Sensor[nnn-1], dtype=np.float32)
+    if nnn !=74:
+        SNnpfuture=np.asarray(Sensor[nnn+1], dtype=np.float32)
+    
     for ppp in pp:
         XX=ppp[0]
         YY=ppp[1]  
       
 
         #Filtering Zero-Value pixels in both IMERG and MRMS and Filtering Sensros
-        if IMEnp0[XX][YY] !=0 and MRMnp0[XX][YY]!=0 and SNnp0[XX][YY]==0:
+        if IMEnp0[XX][YY] >=np.quantile(IMERG_1d,0.9) and MRMnp0[XX][YY]!=0 and SNnp0[XX][YY]==0 and nnn !=0 and nnn !=74 and SNnpfuture[XX][YY]==0 and SNnplast[XX][YY]==0:
             IMEnpS0.append(IMEnp0[XX][YY])
             MRMnpS0.append(MRMnp0[XX][YY])
             BiasIMS0.append(IMEnp0[XX][YY]-MRMnp0[XX][YY])   
             
             
         #Filtering Zero-Value pixels in both IMERG and MRMS and Filtering Sensros
-        if IMEnp0[XX][YY] !=0 and MRMnp0[XX][YY]!=0 and SNnp0[XX][YY]==3:
+        if IMEnp0[XX][YY] >=np.quantile(IMERG_1d,0.9) and MRMnp0[XX][YY]!=0 and SNnp0[XX][YY]==3:
             IMEnpS3.append(IMEnp0[XX][YY])
             MRMnpS3.append(MRMnp0[XX][YY])
             BiasIMS3.append(IMEnp0[XX][YY]-MRMnp0[XX][YY])   
         
 
         #Filtering Zero-Value pixels in both IMERG and MRMS and Filtering Sensros
-        if IMEnp0[XX][YY] !=0 and MRMnp0[XX][YY]!=0 and SNnp0[XX][YY]==5:
+        if IMEnp0[XX][YY] >=np.quantile(IMERG_1d,0.9) and MRMnp0[XX][YY]!=0 and SNnp0[XX][YY]==5:
             IMEnpS5.append(IMEnp0[XX][YY])
             MRMnpS5.append(MRMnp0[XX][YY])
             BiasIMS5.append(IMEnp0[XX][YY]-MRMnp0[XX][YY])   
 
 
         #Filtering Zero-Value pixels in both IMERG and MRMS and Filtering Sensros
-        if IMEnp0[XX][YY] !=0 and MRMnp0[XX][YY]!=0 and SNnp0[XX][YY]==7:
+        if IMEnp0[XX][YY] >=np.quantile(IMERG_1d,0.9) and MRMnp0[XX][YY]!=0 and SNnp0[XX][YY]==7:
             IMEnpS7.append(IMEnp0[XX][YY])
             MRMnpS7.append(MRMnp0[XX][YY])
             BiasIMS7.append(IMEnp0[XX][YY]-MRMnp0[XX][YY])   
@@ -1130,27 +1151,27 @@ for nnn in range(len(IMERG)):
 
 
         #Filtering Zero-Value pixels in both IMERG and MRMS and Filtering Sensros
-        if IMEnp0[XX][YY] !=0 and MRMnp0[XX][YY]!=0 and SNnp0[XX][YY]==9:
+        if IMEnp0[XX][YY] >=np.quantile(IMERG_1d,0.9) and MRMnp0[XX][YY]!=0 and SNnp0[XX][YY]==9:
             IMEnpS9.append(IMEnp0[XX][YY])
             MRMnpS9.append(MRMnp0[XX][YY])
             BiasIMS9.append(IMEnp0[XX][YY]-MRMnp0[XX][YY])   
 
 
         #Filtering Zero-Value pixels in both IMERG and MRMS and Filtering Sensros
-        if IMEnp0[XX][YY] !=0 and MRMnp0[XX][YY]!=0 and SNnp0[XX][YY]==11:
+        if IMEnp0[XX][YY] >=np.quantile(IMERG_1d,0.9) and MRMnp0[XX][YY]!=0 and SNnp0[XX][YY]==11:
             IMEnpS11.append(IMEnp0[XX][YY])
             MRMnpS11.append(MRMnp0[XX][YY])
             BiasIMS11.append(IMEnp0[XX][YY]-MRMnp0[XX][YY])  
-
-plt.scatter(IMEnpS0,MRMnpS0,label='Sensor 0', s=1)#, lw=3)
-plt.scatter(IMEnpS3,MRMnpS3,label='Sensor 3', s=1)
-plt.scatter(IMEnpS5,MRMnpS5,label='Sensor 5', s=1)
-plt.scatter(IMEnpS7,MRMnpS7,label='Sensor 7', s=1)
-plt.scatter(IMEnpS9,MRMnpS9,label='Sensor 9', s=1)
-plt.scatter(IMEnpS11,MRMnpS11,label='Sensor 11', s=1)
+#
+plt.scatter(IMEnpS0,BiasIMS0,label='Sensor 0')#, s=1)#, lw=3)
+plt.scatter(IMEnpS3,BiasIMS3,label='Sensor 3')#, s=1)
+plt.scatter(IMEnpS5,BiasIMS5,label='Sensor 5')#, s=1)
+plt.scatter(IMEnpS7,BiasIMS7,label='Sensor 7')#, s=1)
+plt.scatter(IMEnpS9,BiasIMS9,label='Sensor 9')#, s=1)
+plt.scatter(IMEnpS11,BiasIMS11,label='Sensor 11')#, s=1)
 #plt.title('Intensity 90th Precentile')
 plt.legend(loc='upper right') 
-plt.ylabel("MRMS")# (IMERG-MRMS) (mm/hr)")   
+plt.ylabel("I-M")# (IMERG-MRMS) (mm/hr)")   
 plt.xlabel("IMERG Intensity (mm/hr)")  
 #plt.yticks(np.arange(-60, 100, step=20))  
 #plt.xticks(np.arange(0, 74, step=1))  
