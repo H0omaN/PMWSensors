@@ -175,7 +175,7 @@ from operator import truediv
 #    ##### this matrix show the number of events in each pixel (NOE) 
 #    for ii in range(rows):
 #        for jj in range(cols):        
-#            if I1[ii][jj] > np.quantile(I,0.9):
+#            if I1[ii][jj] > np.quantile(I,0.95):
 #                NoE[ii][jj]=NoE[ii][jj]+1        
 #    
 #    
@@ -1119,31 +1119,32 @@ for nnn in range(len(IMERG)):
     for ppp in pp:
         XX=ppp[0]
         YY=ppp[1]  
+        Quantile=0.0
       
 
         #Filtering Zero-Value pixels in both IMERG and MRMS and Filtering Sensros
-        if IMEnp0[XX][YY] >=np.quantile(IMERG_1d,0.9) and MRMnp0[XX][YY]!=0 and SNnp0[XX][YY]==0 and nnn !=0 and nnn !=74 and SNnpfuture[XX][YY]==0 and SNnplast[XX][YY]==0:
+        if IMEnp0[XX][YY] >=np.quantile(IMERG_1d,Quantile) and MRMnp0[XX][YY]!=0 and SNnp0[XX][YY]==0 and nnn !=0 and nnn !=74 and SNnpfuture[XX][YY]==0 and SNnplast[XX][YY]==0:
             IMEnpS0.append(IMEnp0[XX][YY])
             MRMnpS0.append(MRMnp0[XX][YY])
             BiasIMS0.append(IMEnp0[XX][YY]-MRMnp0[XX][YY])   
             
             
         #Filtering Zero-Value pixels in both IMERG and MRMS and Filtering Sensros
-        if IMEnp0[XX][YY] >=np.quantile(IMERG_1d,0.9) and MRMnp0[XX][YY]!=0 and SNnp0[XX][YY]==3:
+        if IMEnp0[XX][YY] >=np.quantile(IMERG_1d,Quantile) and MRMnp0[XX][YY]!=0 and SNnp0[XX][YY]==3:
             IMEnpS3.append(IMEnp0[XX][YY])
             MRMnpS3.append(MRMnp0[XX][YY])
             BiasIMS3.append(IMEnp0[XX][YY]-MRMnp0[XX][YY])   
         
 
         #Filtering Zero-Value pixels in both IMERG and MRMS and Filtering Sensros
-        if IMEnp0[XX][YY] >=np.quantile(IMERG_1d,0.9) and MRMnp0[XX][YY]!=0 and SNnp0[XX][YY]==5:
+        if IMEnp0[XX][YY] >=np.quantile(IMERG_1d,Quantile) and MRMnp0[XX][YY]!=0 and SNnp0[XX][YY]==5:
             IMEnpS5.append(IMEnp0[XX][YY])
             MRMnpS5.append(MRMnp0[XX][YY])
             BiasIMS5.append(IMEnp0[XX][YY]-MRMnp0[XX][YY])   
 
 
         #Filtering Zero-Value pixels in both IMERG and MRMS and Filtering Sensros
-        if IMEnp0[XX][YY] >=np.quantile(IMERG_1d,0.9) and MRMnp0[XX][YY]!=0 and SNnp0[XX][YY]==7:
+        if IMEnp0[XX][YY] >=np.quantile(IMERG_1d,Quantile) and MRMnp0[XX][YY]!=0 and SNnp0[XX][YY]==7:
             IMEnpS7.append(IMEnp0[XX][YY])
             MRMnpS7.append(MRMnp0[XX][YY])
             BiasIMS7.append(IMEnp0[XX][YY]-MRMnp0[XX][YY])   
@@ -1151,14 +1152,14 @@ for nnn in range(len(IMERG)):
 
 
         #Filtering Zero-Value pixels in both IMERG and MRMS and Filtering Sensros
-        if IMEnp0[XX][YY] >=np.quantile(IMERG_1d,0.9) and MRMnp0[XX][YY]!=0 and SNnp0[XX][YY]==9:
+        if IMEnp0[XX][YY] >=np.quantile(IMERG_1d,Quantile) and MRMnp0[XX][YY]!=0 and SNnp0[XX][YY]==9:
             IMEnpS9.append(IMEnp0[XX][YY])
             MRMnpS9.append(MRMnp0[XX][YY])
             BiasIMS9.append(IMEnp0[XX][YY]-MRMnp0[XX][YY])   
 
 
         #Filtering Zero-Value pixels in both IMERG and MRMS and Filtering Sensros
-        if IMEnp0[XX][YY] >=np.quantile(IMERG_1d,0.9) and MRMnp0[XX][YY]!=0 and SNnp0[XX][YY]==11:
+        if IMEnp0[XX][YY] >=np.quantile(IMERG_1d,Quantile) and MRMnp0[XX][YY]!=0 and SNnp0[XX][YY]==11:
             IMEnpS11.append(IMEnp0[XX][YY])
             MRMnpS11.append(MRMnp0[XX][YY])
             BiasIMS11.append(IMEnp0[XX][YY]-MRMnp0[XX][YY])  
