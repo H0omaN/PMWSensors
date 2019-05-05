@@ -14,7 +14,7 @@ from scipy.interpolate import interp1d
 import numpy.ma as ma
 from operator import truediv
 ##
-#
+
 #class Pixel:
 #  def __init__(self, ID, Bias,Intensity,Quantile,QualityIndex,RBias):
 #      self.ID = ID
@@ -173,10 +173,10 @@ from operator import truediv
 #                Pixellist00.append(Pixel(S1[ii][jj],M1[ii][jj]-I1[ii][jj],I1[ii][jj],1,QI1[ii][jj],(M1[ii][jj]-I1[ii][jj])/I1[ii][jj]))
 #         
 #    ##### this matrix show the number of events in each pixel (NOE) 
-#    for ii in range(rows):
-#        for jj in range(cols):        
-#            if I1[ii][jj] > np.quantile(I,0.95):
-#                NoE[ii][jj]=NoE[ii][jj]+1        
+##    for ii in range(rows):
+##        for jj in range(cols):        
+##            if I1[ii][jj] > np.quantile(I,0.95):
+##                NoE[ii][jj]=NoE[ii][jj]+1        
 #    
 #    
 #    
@@ -1050,14 +1050,14 @@ from operator import truediv
 ####Scatter Plot of random pixels:
 ####################################################################
     
-pp=list()
-
-for ii in range(rows):
-    print('one row has completed')
-    for jj in range(cols):        
-        if NoE[ii][jj] > 0:
-            pp.append([ii,jj])
-            
+#pp=list()
+#
+#for ii in range(rows):
+#    print('one row has completed')
+#    for jj in range(cols):        
+#        if NoE[ii][jj] > 0:
+#            pp.append([ii,jj])
+#            
             
 #    for ii in range(rows):
 #        for jj in range(cols):
@@ -1112,67 +1112,91 @@ for nnn in range(len(IMERG)):
                 IMERG_1d.append(IMEnp0[ii][jj])
     # get the sensor at back and forward timestep
     if nnn !=0:
-        SNnplast=np.asarray(Sensor[nnn-1], dtype=np.float32)
+        SNnplast=np.asarray(Sensor[nnn-1], dtype=np.float32) 
+#        IMEnplast=np.asarray(IMERG[nnn-1], dtype=np.float32)
+#        MRMnplast=np.asarray(MRMS[nnn-1], dtype=np.float32) 
+        if nnn !=1:
+            SNnplastlast=np.asarray(Sensor[nnn-2], dtype=np.float32)
+            if nnn !=2:
+                SNnplastlastlast=np.asarray(Sensor[nnn-3], dtype=np.float32)
+#            IMEnplastlast=np.asarray(IMERG[nnn-2], dtype=np.float32) 
+#            MRMnplastlast=np.asarray(MRMS[nnn-2], dtype=np.float32) 
+        
     if nnn !=74:
         SNnpfuture=np.asarray(Sensor[nnn+1], dtype=np.float32)
-    
-    for ppp in pp:
-        XX=ppp[0]
-        YY=ppp[1]  
-        Quantile=0.0
-      
-
-        #Filtering Zero-Value pixels in both IMERG and MRMS and Filtering Sensros
-        if IMEnp0[XX][YY] >=np.quantile(IMERG_1d,Quantile) and MRMnp0[XX][YY]!=0 and SNnp0[XX][YY]==0 and nnn !=0 and nnn !=74 and SNnpfuture[XX][YY]==0 and SNnplast[XX][YY]==0:
-            IMEnpS0.append(IMEnp0[XX][YY])
-            MRMnpS0.append(MRMnp0[XX][YY])
-            BiasIMS0.append(IMEnp0[XX][YY]-MRMnp0[XX][YY])   
-            
-            
-        #Filtering Zero-Value pixels in both IMERG and MRMS and Filtering Sensros
-        if IMEnp0[XX][YY] >=np.quantile(IMERG_1d,Quantile) and MRMnp0[XX][YY]!=0 and SNnp0[XX][YY]==3:
-            IMEnpS3.append(IMEnp0[XX][YY])
-            MRMnpS3.append(MRMnp0[XX][YY])
-            BiasIMS3.append(IMEnp0[XX][YY]-MRMnp0[XX][YY])   
+#        MRMnpfuture=np.asarray(MRMS[nnn+1], dtype=np.float32) 
+#        IMEnpfuture=np.asarray(IMERG[nnn+1], dtype=np.float32) 
+        if nnn !=73:
+            SNnpfuturefuture=np.asarray(Sensor[nnn+2], dtype=np.float32)
+            if nnn !=72:
+                SNnpfuturefuturefuture=np.asarray(Sensor[nnn+3], dtype=np.float32)
+#            IMEnpfuturefuture=np.asarray(IMERG[nnn+2], dtype=np.float32) 
+#            MRMnpfuturefuture=np.asarray(MRMS[nnn+2], dtype=np.float32) 
         
+        
+    
+#    for ppp in pp:
+#        XX=ppp[0]
+#        YY=ppp[1]  
+        
+    for ii in range(rows):    
+        for jj in range(cols):
+            XX=ii
+            YY=jj
+            Quantile=0.0
+          
+    
+            #Filtering Zero-Value pixels in both IMERG and MRMS and Filtering Sensros
+            if IMEnp0[XX][YY] >np.quantile(IMERG_1d,Quantile) and MRMnp0[XX][YY]!=0 and SNnp0[XX][YY]==0 and nnn !=0 and nnn !=74 and SNnpfuture[XX][YY]==0 and SNnplast[XX][YY]==0:
+                IMEnpS0.append(IMEnp0[XX][YY])
+                MRMnpS0.append(MRMnp0[XX][YY])
+                BiasIMS0.append(IMEnp0[XX][YY]-MRMnp0[XX][YY])   
+                
+                
+            #Filtering Zero-Value pixels in both IMERG and MRMS and Filtering Sensros
+            if IMEnp0[XX][YY] >np.quantile(IMERG_1d,Quantile) and MRMnp0[XX][YY]!=0 and SNnp0[XX][YY]==3 and SNnpfuture[XX][YY]!=0 and nnn<73:
+                IMEnpS3.append(IMEnp0[XX][YY])
+                MRMnpS3.append(MRMnp0[XX][YY])
+                BiasIMS3.append(IMEnp0[XX][YY]-MRMnp0[XX][YY])   
+            
+    
+            #Filtering Zero-Value pixels in both IMERG and MRMS and Filtering Sensros
+            if IMEnp0[XX][YY] >np.quantile(IMERG_1d,Quantile) and MRMnp0[XX][YY]!=0 and SNnp0[XX][YY]==5 and SNnpfuture[XX][YY]!=0 and nnn<73:
+                IMEnpS5.append(IMEnp0[XX][YY])
+                MRMnpS5.append(MRMnp0[XX][YY])
+                BiasIMS5.append(IMEnp0[XX][YY]-MRMnp0[XX][YY])   
+    
+    
+            #Filtering Zero-Value pixels in both IMERG and MRMS and Filtering Sensros
+            if IMEnp0[XX][YY] >np.quantile(IMERG_1d,Quantile) and MRMnp0[XX][YY]!=0 and SNnp0[XX][YY]==7 and SNnpfuture[XX][YY]!=0 and nnn<73:
+                IMEnpS7.append(IMEnp0[XX][YY])
+                MRMnpS7.append(MRMnp0[XX][YY])
+                BiasIMS7.append(IMEnp0[XX][YY]-MRMnp0[XX][YY])   
+    
+    
+    
+            #Filtering Zero-Value pixels in both IMERG and MRMS and Filtering Sensros
+            if IMEnp0[XX][YY] >np.quantile(IMERG_1d,Quantile) and MRMnp0[XX][YY]!=0 and SNnp0[XX][YY]==9 and SNnpfuture[XX][YY]!=0 and nnn<73:
+                IMEnpS9.append(IMEnp0[XX][YY])
+                MRMnpS9.append(MRMnp0[XX][YY])
+                BiasIMS9.append(IMEnp0[XX][YY]-MRMnp0[XX][YY])   
+    
+    
+            #Filtering Zero-Value pixels in both IMERG and MRMS and Filtering Sensros
+            if IMEnp0[XX][YY] >np.quantile(IMERG_1d,Quantile) and MRMnp0[XX][YY]!=0 and SNnp0[XX][YY]==11 and SNnpfuture[XX][YY]!=0 and nnn<73:
+                IMEnpS11.append(IMEnp0[XX][YY])
+                MRMnpS11.append(MRMnp0[XX][YY])
+                BiasIMS11.append(IMEnp0[XX][YY]-MRMnp0[XX][YY])  
 
-        #Filtering Zero-Value pixels in both IMERG and MRMS and Filtering Sensros
-        if IMEnp0[XX][YY] >=np.quantile(IMERG_1d,Quantile) and MRMnp0[XX][YY]!=0 and SNnp0[XX][YY]==5:
-            IMEnpS5.append(IMEnp0[XX][YY])
-            MRMnpS5.append(MRMnp0[XX][YY])
-            BiasIMS5.append(IMEnp0[XX][YY]-MRMnp0[XX][YY])   
-
-
-        #Filtering Zero-Value pixels in both IMERG and MRMS and Filtering Sensros
-        if IMEnp0[XX][YY] >=np.quantile(IMERG_1d,Quantile) and MRMnp0[XX][YY]!=0 and SNnp0[XX][YY]==7:
-            IMEnpS7.append(IMEnp0[XX][YY])
-            MRMnpS7.append(MRMnp0[XX][YY])
-            BiasIMS7.append(IMEnp0[XX][YY]-MRMnp0[XX][YY])   
-
-
-
-        #Filtering Zero-Value pixels in both IMERG and MRMS and Filtering Sensros
-        if IMEnp0[XX][YY] >=np.quantile(IMERG_1d,Quantile) and MRMnp0[XX][YY]!=0 and SNnp0[XX][YY]==9:
-            IMEnpS9.append(IMEnp0[XX][YY])
-            MRMnpS9.append(MRMnp0[XX][YY])
-            BiasIMS9.append(IMEnp0[XX][YY]-MRMnp0[XX][YY])   
-
-
-        #Filtering Zero-Value pixels in both IMERG and MRMS and Filtering Sensros
-        if IMEnp0[XX][YY] >=np.quantile(IMERG_1d,Quantile) and MRMnp0[XX][YY]!=0 and SNnp0[XX][YY]==11:
-            IMEnpS11.append(IMEnp0[XX][YY])
-            MRMnpS11.append(MRMnp0[XX][YY])
-            BiasIMS11.append(IMEnp0[XX][YY]-MRMnp0[XX][YY])  
-#
-plt.scatter(IMEnpS0,BiasIMS0,label='Sensor 0')#, s=1)#, lw=3)
+#plt.scatter(IMEnpS0,BiasIMS0,label='Sensor 0')#, s=1)#, lw=3)
 plt.scatter(IMEnpS3,BiasIMS3,label='Sensor 3')#, s=1)
-plt.scatter(IMEnpS5,BiasIMS5,label='Sensor 5')#, s=1)
-plt.scatter(IMEnpS7,BiasIMS7,label='Sensor 7')#, s=1)
-plt.scatter(IMEnpS9,BiasIMS9,label='Sensor 9')#, s=1)
-plt.scatter(IMEnpS11,BiasIMS11,label='Sensor 11')#, s=1)
-#plt.title('Intensity 90th Precentile')
+#plt.scatter(IMEnpS5,BiasIMS5,label='Sensor 5')#, s=1)
+#plt.scatter(IMEnpS7,BiasIMS7,label='Sensor 7')#, s=1)
+#plt.scatter(IMEnpS9,BiasIMS9,label='Sensor 9')#, s=1)
+#plt.scatter(IMEnpS11,BiasIMS11,label='Sensor 11')#, s=1)
+plt.title('For Consecutive Sensors 1step')
 plt.legend(loc='upper right') 
-plt.ylabel("I-M")# (IMERG-MRMS) (mm/hr)")   
+plt.ylabel("Bias (IMERG-MRMS)")# (IMERG-MRMS) (mm/hr)")   
 plt.xlabel("IMERG Intensity (mm/hr)")  
 #plt.yticks(np.arange(-60, 100, step=20))  
 #plt.xticks(np.arange(0, 74, step=1))  
