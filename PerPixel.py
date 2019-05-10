@@ -891,46 +891,47 @@ for eachmemebrofPixellist in Pixellist0:
 
 
 
-#######Plotting the bar chart with Random Pixels with MRMS and IMERG IMAGES: 
-#################################################################### 
-#i=1
-#
-##for file in outpufiles:
-#IMERGfile = Dataset(IMERG_files[i-1], 'r')
-#SensorType=IMERGfile.variables['HQprecipSource'][:,:]
-#SensorType[SensorType<0]=0
-#
-#Modeoutput = Dataset(file, 'r')
-#IMERGMask=Modeoutput.variables['fcst_obj_raw'][:,:]    
-#MRMSMask=Modeoutput.variables['obs_obj_raw'][:,:]
-#plt.subplot(2,2,1)
-#plt.title('I'+str(i))
-#plt.imshow(np.transpose(SensorType))
-#plt.imshow(IMERGMask)
-#plt.scatter(126,111,color='red',s=2)
-#
-#plt.xticks([])
-#plt.yticks([])
-#plt.subplot(2,2,2)
-#plt.title('M'+str(i))
-#plt.imshow(MRMSMask)
-#plt.scatter(126,111,color='red',s=2)
-#
-#plt.xticks([])
-#plt.yticks([])
-#
-#
-#
-#mng = plt.get_current_fig_manager()
-#mng.window.showMaximized()
-#plt.tight_layout()
-##    plt.savefig('/home/ho0man/Temp/modeoutputs/Apr29/IMSHOW/'+str(i)+'.png',dpi=600)
-##    plt.close()
-#i=i+1
-#
-#
-#
-#
+######Plotting the bar chart with Random Pixels with MRMS and IMERG IMAGES: 
+################################################################### 
+
+    
+
+i=0
+
+for file in outpufiles:
+    IMERGfile = Dataset(IMERG_files[i], 'r')
+    SensorType=IMERGfile.variables['HQprecipSource'][:,:]
+    SensorType[SensorType<0]=0
+    
+    Modeoutput = Dataset(file, 'r')
+    IMERGMask=Modeoutput.variables['fcst_obj_raw'][:,:]    
+    MRMSMask=Modeoutput.variables['obs_obj_raw'][:,:]
+    plt.subplot(2,2,1)
+    plt.title('I'+str(i))
+    plt.imshow(np.transpose(SensorType), cmap='Greys')
+    plt.imshow(IMERGMask, vmin=0, vmax=70)
+    #plt.scatter(126,111,color='red',s=2)
+    
+    plt.xticks([])
+    plt.yticks([])
+    plt.subplot(2,2,2)
+    plt.title('M'+str(i))
+    plt.imshow(MRMSMask, vmin=0, vmax=70)
+    #plt.scatter(126,111,color='red',s=2)
+    
+    plt.xticks([])
+    plt.yticks([])
+    
+    mng = plt.get_current_fig_manager()
+    mng.window.showMaximized()
+    plt.tight_layout()
+    plt.savefig('/srv/ccrc/data60/z5194283/OutPuts/2DSensorsImages/'+str(i)+'.png',dpi=600)
+    plt.close()
+    i=i+1
+
+
+
+
 #plt.subplot(2,1,2)
 #IME=[Id[XX][YY] for Id in IMERG]
 #plt.plot(Timestep,IME,label='IMERG')#, lw=3)
@@ -945,8 +946,8 @@ for eachmemebrofPixellist in Pixellist0:
 #plt.xticks(np.arange(0, 74, step=1))  
 #plt.grid()
 #plt.tight_layout()  
-##
-#    
+#
+    
 
 
 #
@@ -1067,7 +1068,7 @@ for eachmemebrofPixellist in Pixellist0:
 #YY=126
             
 ###### Plotting scatters for each with sensor classification:
-           
+##           
 #IMEnp=list()
 #MRMnp=list()
 #BiasIM=list()   
@@ -1152,26 +1153,120 @@ for eachmemebrofPixellist in Pixellist0:
 #                        MRMnpS11.append(MRMnp0[XX][YY])
 #                        BiasIMS11.append(IMEnp0[XX][YY]-MRMnp0[XX][YY])  
 
-#plt.scatter(IMEnpS0,BiasIMS0,label='Sensor 0')#, s=1)#, lw=3)
-#plt.scatter(IMEnpS3,BiasIMS3,label='Sensor 3')#, s=1)
-#plt.scatter(IMEnpS5,BiasIMS5,label='Sensor 5')#, s=1)
-#plt.scatter(IMEnpS7,BiasIMS7,label='Sensor 7')#, s=1)
-#plt.scatter(IMEnpS9,BiasIMS9,label='Sensor 9')#, s=1)
-#plt.scatter(IMEnpS11,BiasIMS11,label='Sensor 11')#, s=1)
+#plt.scatter(IMEnpS0,MRMnpS0,label='Sensor 0')#, s=1)#, lw=3)
+#plt.scatter(IMEnpS3,MRMnpS3,label='Sensor 3')#, s=1)
+#plt.scatter(IMEnpS5,MRMnpS5,label='Sensor 5')#, s=1)
+#plt.scatter(IMEnpS7,MRMnpS7,label='Sensor 7')#, s=1)
+#plt.scatter(IMEnpS9,MRMnpS9,label='Sensor 9')#, s=1)
+#plt.scatter(IMEnpS11,MRMnpS11,label='Sensor 11')#, s=1)
 ##plt.title('Intensity 90th Precentile')
 #plt.legend(loc='upper right') 
-#plt.ylabel("MRMS")# (IMERG-MRMS) (mm/hr)")   
+#plt.ylabel("MRMS Intensity (mm/hr)")# (IMERG-MRMS) (mm/hr)")   
 #plt.xlabel("IMERG Intensity (mm/hr)")  
 ##plt.yticks(np.arange(-60, 100, step=20))  
 ##plt.xticks(np.arange(0, 74, step=1))  
 #plt.grid()
 #plt.tight_layout()  
+
+#xmin=0
+#xmax=115
+#ymin=0
+#ymax=50
+#step=10
+#ylabel='IMERG Intensity (mm/hr)'
+#xlabel='MRMS Intensity (mm/hr)'
+#plt.subplot(2,3,1)     
+#plt.scatter(MRMnpS0,IMEnpS0,label='Sensor 0')#, s=1)#, lw=3)
+#plt.title('IR-Isolated 1 step')
+#plt.legend(loc='upper right') 
+#plt.ylabel(ylabel)# (IMERG-MRMS) (mm/hr)") 
+#plt.xlabel(xlabel)  
+#plt.axis('scaled')
+#axes = plt.gca()
+#axes.set_xlim([xmin,xmax])
+#axes.set_ylim([ymin,ymax])
+#plt.yticks(np.arange(ymin, ymax, step=step))  
+#plt.xticks(np.arange(xmin, xmax, step=step))   
+#plt.grid()
 #
-#### histogram plotting
+#plt.subplot(2,3,2)     
+#plt.scatter(MRMnpS3,IMEnpS3,label='Sensor 3')#, s=1)
+#plt.title('Sensor 3-Isolated 2 steps')
+#plt.legend(loc='upper right') 
+#plt.ylabel(ylabel)# (IMERG-MRMS) (mm/hr)") 
+#plt.xlabel(xlabel)  
+#plt.axis('scaled')
+#axes = plt.gca()
+#axes.set_xlim([xmin,xmax])
+#axes.set_ylim([ymin,ymax])
+#plt.yticks(np.arange(ymin, ymax, step=step))  
+#plt.xticks(np.arange(xmin, xmax, step=step))   
+#plt.grid()
+#
+#plt.subplot(2,3,3)     
+#plt.scatter(MRMnpS5,IMEnpS5,label='Sensor 5')#, s=1)
+#plt.title('Sensor 5-Isolated 2 steps')
+#plt.legend(loc='upper right') 
+#plt.ylabel(ylabel)# (IMERG-MRMS) (mm/hr)") 
+#plt.xlabel(xlabel)  
+#plt.axis('scaled')
+#axes = plt.gca()
+#axes.set_xlim([xmin,xmax])
+#axes.set_ylim([ymin,ymax])
+#plt.yticks(np.arange(ymin, ymax, step=step))  
+#plt.xticks(np.arange(xmin, xmax, step=step))  
+#plt.grid()
+#
+#plt.subplot(2,3,4)   
+#plt.scatter(MRMnpS7,IMEnpS7,label='Sensor 7')#, s=1)  
+#plt.title('Sensor 7-Isolated 2 steps')
+#plt.legend(loc='upper right') 
+#plt.ylabel(ylabel)# (IMERG-MRMS) (mm/hr)") 
+#plt.xlabel(xlabel)  
+#plt.axis('scaled')
+#axes = plt.gca()
+#axes.set_xlim([xmin,xmax])
+#axes.set_ylim([ymin,ymax])
+#plt.yticks(np.arange(ymin, ymax, step=step))  
+#plt.xticks(np.arange(xmin, xmax, step=step))     
+#plt.grid()
+#
+#plt.subplot(2,3,5)    
+#plt.scatter(MRMnpS9,IMEnpS9,label='Sensor 9')#, s=1) 
+#plt.title('Sensor 9-Isolated 2 steps')
+#plt.legend(loc='upper right') 
+#plt.ylabel(ylabel)# (IMERG-MRMS) (mm/hr)") 
+#plt.xlabel(xlabel)  
+#plt.axis('scaled')
+#axes = plt.gca()
+#axes.set_xlim([xmin,xmax])
+#axes.set_ylim([ymin,ymax])
+#plt.yticks(np.arange(ymin, ymax, step=step))  
+#plt.xticks(np.arange(xmin, xmax, step=step))   
+#plt.grid()
+#
+#plt.subplot(2,3,6)  
+#plt.scatter(MRMnpS11,IMEnpS11,label='Sensor 11')#, s=1)   
+#plt.title('Sensor 11-Isolated 2 steps')
+#plt.legend(loc='upper right') 
+#plt.ylabel(ylabel)# (IMERG-MRMS) (mm/hr)") 
+#plt.xlabel(xlabel)  
+#plt.axis('scaled')
+#axes = plt.gca()
+#axes.set_xlim([xmin,xmax])
+#axes.set_ylim([ymin,ymax])
+#plt.yticks(np.arange(ymin, ymax, step=step))  
+#plt.xticks(np.arange(xmin, xmax, step=step))  
+#
+#plt.grid()
+#
+#plt.tight_layout()  
+#
+#### histogram 1d plotting
 #plt.subplot(2,3,1)         
 #plt.hist(BiasIMS0, bins=200)
 #plt.ylabel('No of times')
-#plt.title('IR-Only')
+#plt.title('IR-Only-Isolated 1 step')
 #plt.xticks(np.arange(-40, 60, step=10)) 
 #plt.xlim([-40,60])
 #
@@ -1216,69 +1311,87 @@ for eachmemebrofPixellist in Pixellist0:
 
 
 
-### histogram plotting
-plt.subplot(2,3,1)         
-plt.hist2d(IMEnpS0, BiasIMS0, bins=int(np.max(IMEnpS0)/0.25), cmap='Reds')
-plt.ylabel('No of times')
-plt.title('IR-Only')
-#plt.xticks(np.arange(-40, 60, step=10)) 
-plt.ylim([-10,20])
-plt.xlim([0,20])
-cb = plt.colorbar()
-cb.set_label('counts in bin')
-
-plt.subplot(2,3,2)         
-plt.hist2d(IMEnpS3, BiasIMS3, bins=int(np.max(IMEnpS3)/0.25), cmap='Reds')
-plt.ylabel('No of times')
-plt.title('Sensor 3')
-#plt.xticks(np.arange(-40, 60, step=10)) 
-plt.ylim([-10,20])
-plt.xlim([0,20])
-cb = plt.colorbar()
-cb.set_label('counts in bin')
-
-plt.subplot(2,3,3)         
-plt.hist2d(IMEnpS5, BiasIMS5, bins=int(np.max(IMEnpS5)/0.25), cmap='Reds')
-plt.ylabel('No of times')
-plt.title('Sensor 5')
-#plt.xticks(np.arange(-40, 60, step=10)) 
-plt.ylim([-10,20])
-plt.xlim([0,20])
-cb = plt.colorbar()
-cb.set_label('counts in bin')
-
-plt.subplot(2,3,4)         
-plt.hist2d(IMEnpS7, BiasIMS7, bins=int(np.max(IMEnpS7)/0.25), cmap='Reds')
-plt.ylabel('No of times')
-plt.title('Sensor 7')
-#plt.xticks(np.arange(-40, 60, step=10)) 
-plt.ylim([-10,20])
-plt.xlim([0,20])
-cb = plt.colorbar()
-cb.set_label('counts in bin')
-
-plt.subplot(2,3,5)         
-plt.hist2d(IMEnpS9, BiasIMS9, bins=int(np.max(IMEnpS9)/0.25), cmap='Reds')
-plt.ylabel('No of times')
-plt.title('Sensor 9')
-#plt.xticks(np.arange(-40, 60, step=10)) 
-plt.ylim([-10,20])
-plt.xlim([0,20])
-plt.xlabel('IMERG-Intensity')
-cb = plt.colorbar()
-cb.set_label('counts in bin')
-
-plt.subplot(2,3,6)         
-plt.hist2d(IMEnpS11, BiasIMS11, bins=int(np.max(IMEnpS11)/0.25), cmap='Reds')
-plt.ylabel('No of times')
-plt.title('Sensor 11')
-#plt.xticks(np.arange(-40, 60, step=10)) 
-plt.ylim([-10,20])
-plt.xlim([0,20])
-cb = plt.colorbar()
-cb.set_label('counts in bin')
-
-plt.tight_layout() 
+## histogram 2d plotting
+#xmin=0
+#xmax=20
+#ymin=0
+#ymax=20   
+#ylabel='IMERG Intensity (mm/hr)'
+#    
+#    
+#plt.subplot(2,3,1)         
+#plt.hist2d(MRMnpS0, IMEnpS0, bins=int(np.max(MRMnpS0)/0.5), cmap='Reds')
+#plt.ylabel('No of times')
+#plt.title('IR-Only-Isolated 1 step')
+##plt.xticks(np.arange(-40, 60, step=10)) 
+#plt.axis('scaled')
+#plt.ylim([ymin,ymax])
+#plt.xlim([xmin,xmax])
+#plt.ylabel(ylabel)
+#
+#cb = plt.colorbar()
+#cb.set_label('counts in bin')
+#
+#plt.subplot(2,3,2)         
+#plt.hist2d(MRMnpS3, IMEnpS3, bins=int(np.max(MRMnpS3)/0.5), cmap='Reds')
+#plt.ylabel('No of times')
+#plt.title('Sensor 3-Isolated 2 steps')
+##plt.xticks(np.arange(-40, 60, step=10))
+#plt.axis('scaled')
+#plt.ylim([ymin,ymax])
+#plt.xlim([xmin,xmax])
+#
+#cb = plt.colorbar()
+#cb.set_label('counts in bin')
+#
+#plt.subplot(2,3,3)         
+#plt.hist2d(MRMnpS5, IMEnpS5, bins=int(np.max(MRMnpS5)/0.5), cmap='Reds')
+#plt.ylabel('No of times')
+#plt.title('Sensor 5-Isolated 2 steps')
+##plt.xticks(np.arange(-40, 60, step=10)) 
+#plt.axis('scaled')
+#plt.ylim([ymin,ymax])
+#plt.xlim([xmin,xmax])
+#cb = plt.colorbar()
+#cb.set_label('counts in bin')
+#
+#plt.subplot(2,3,4)         
+#plt.hist2d(MRMnpS7, IMEnpS7, bins=int(np.max(MRMnpS7)/0.5), cmap='Reds')
+#plt.ylabel('No of times')
+#plt.title('Sensor 7-Isolated 2 steps')
+##plt.xticks(np.arange(-40, 60, step=10)) 
+#plt.axis('scaled')
+#plt.ylim([ymin,ymax])
+#plt.xlim([xmin,xmax])
+#plt.ylabel(ylabel)
+#cb = plt.colorbar()
+#cb.set_label('counts in bin')
+#
+#plt.subplot(2,3,5)         
+#plt.hist2d(MRMnpS9, IMEnpS9, bins=int(np.max(MRMnpS9)/0.5), cmap='Reds')
+#plt.ylabel('No of times')
+#plt.title('Sensor 9-Isolated 2 steps')
+##plt.xticks(np.arange(-40, 60, step=10)) 
+#plt.axis('scaled')
+#plt.ylim([ymin,ymax])
+#plt.xlim([xmin,xmax])
+#plt.xlabel('MRMS-Intensity')
+#
+#cb = plt.colorbar()
+#cb.set_label('counts in bin')
+#
+#plt.subplot(2,3,6)         
+#plt.hist2d(MRMnpS11, IMEnpS11, bins=int(np.max(MRMnpS11)/0.5), cmap='Reds')
+#plt.ylabel('No of times')
+#plt.title('Sensor 11-Isolated 2 steps')
+##plt.xticks(np.arange(-40, 60, step=10)) 
+#plt.axis('scaled')
+#plt.ylim([ymin,ymax])
+#plt.xlim([xmin,xmax])
+#cb = plt.colorbar()
+#cb.set_label('counts in bin')
+#
+#plt.tight_layout() 
 
 
 
