@@ -28,7 +28,7 @@ class Pixel:
 # Netcdf file mode outputs for PC:
 #outputfolder="/home/ho0man/Temp/modeoutputs/ModeOutPut-Modified/"
 # Netcdf file mode outputs for Storms:
-outputfolder="/srv/ccrc/data60/z5194283/OutPuts/ModeOutputs-IMERGHHL-V05/"
+outputfolder="/srv/ccrc/data60/z5194283/OutPuts/IMERG-MRMS-Larger-Domain-Mode-Run/"
 outpufiles=glob.glob(outputfolder+"*_obj.nc")
 outpufiles.sort() 
 # TXT mode outputs
@@ -37,10 +37,10 @@ txtoutputfiles.sort()
 ## input IMERG and MRMS files for PC:
 #folder="/home/ho0man/Temp/modeoutputs/Sample/"
 # input IMERG and MRMS files for Storms:
-folder="/srv/ccrc/data60/z5194283/Data/"
-IMERG_files=glob.glob(folder+"IMERG-Comprehensive-HHL-V05/*.nc")
+folder="/srv/ccrc/data60/z5194283/Data/LargerDomain/"
+IMERG_files=glob.glob(folder+"IMERG_HHFV06B/Selected/*.nc")
 IMERG_files.sort()  
-MRMS_files=glob.glob(folder+"MRMS-Regridded/*.nc")
+MRMS_files=glob.glob(folder+"MRMS-RegriddedLargeDomain-6Days-30min/Selected/*.nc")
 MRMS_files.sort()  
 ########################
 #Filtering the Hurricane by using Mask created by MODE
@@ -110,23 +110,23 @@ for file in  outpufiles:
     IMERGMask[IMERGMask<0]=0
     IMERGMask[IMERGMask>1]=0
         
-    ######Below is the Mask of other objects excluding Hurricane
-    IMERGMask[IMERGMask<1]=-1
-    IMERGMask[IMERGMask>0]=0
-    IMERGMask[IMERGMask<0]=1
-    
-    ######Below is the mask of all places
-    IMERGMask[IMERGMask<1]=1
+#    ######Below is the Mask of other objects excluding Hurricane
+#    IMERGMask[IMERGMask<1]=-1
+#    IMERGMask[IMERGMask>0]=0
+#    IMERGMask[IMERGMask<0]=1
+#    
+#    ######Below is the mask of all places
+#    IMERGMask[IMERGMask<1]=1
 
     MRMSMask=Modeoutput.variables['obs_clus_id'][:,:]
     MRMSMask[MRMSMask<0]=0
     MRMSMask[MRMSMask>1]=0
     IMERGfile = Dataset(IMERG_files[i], 'r')
-    SensorType=IMERGfile.variables['HQprecipSource'][:,:]
+    SensorType=IMERGfile.variables['HQprecipSource'][0,:,:]
     SensorType[SensorType<0]=0
-    IMERGData=IMERGfile.variables['HQprecipitation'][:,:] 
+    IMERGData=IMERGfile.variables['precipitationCal'][0,:,:] 
     IMERGData[IMERGData<0]=0
-    QIData=IMERGfile.variables['precipitationQualityIndex'][:,:] 
+    QIData=IMERGfile.variables['precipitationQualityIndex'][0,:,:] 
     QIData[QIData<0]=0
 #    IRonly=IMERGfile.variables['IRprecipitation'][:,:] 
 #    IRonly[IRonly<0]=0
@@ -1078,33 +1078,44 @@ Timestep=np.arange(i)
 #XX=95
 #YY=126
             
-###### Plotting scatters for each with sensor classification:
-##           
+####### Plotting scatters for each with sensor classification:
+#           
 IMEnp=list()
 MRMnp=list()
 BiasIM=list()   
 
 IMEnpS0=list()
 MRMnpS0=list()
-BiasIMS0=list()    
+BiasIMS0=list()  
+NEventS0=list()  
 IMEnpS3=list()
 MRMnpS3=list()
 BiasIMS3=list()   
+NEventS3=list()  
 IMEnpS5=list()
 MRMnpS5=list()
-BiasIMS5=list()   
+BiasIMS5=list() 
+NEventS5=list()    
 IMEnpS7=list()
 MRMnpS7=list()
 BiasIMS7=list()   
+NEventS7=list()  
 IMEnpS9=list()
 MRMnpS9=list()
-BiasIMS9=list()   
+BiasIMS9=list()  
+NEventS9=list()   
 IMEnpS11=list()
 MRMnpS11=list()
-BiasIMS11=list()     
+BiasIMS11=list()    
+NEventS11=list()   
+IMEnpS20=list()
+MRMnpS20=list()
+BiasIMS20=list() 
+NEventS20=list()  
 IMEnpS=list()
 MRMnpS=list()
 BiasIMS=list() 
+NEventS=list()  
 
 for nnn in range(len(IMERG)):
     print(str(nnn))
@@ -1115,9 +1126,9 @@ for nnn in range(len(IMERG)):
         SNnplast=np.asarray(Sensor[nnn-1], dtype=np.float32)
         if nnn!=1:
             SNnplastlast=np.asarray(Sensor[nnn-2], dtype=np.float32)
-    if nnn<74:
+    if nnn<152:
         SNnpfuture=np.asarray(Sensor[nnn+1], dtype=np.float32)
-        if nnn<73:
+        if nnn<151:
             SNnpfuturefuture=np.asarray(Sensor[nnn+2], dtype=np.float32)
             
             
@@ -1125,19 +1136,21 @@ for nnn in range(len(IMERG)):
         for YY in range(len(IMEnp0[0])):      
 
             #Filtering Zero-Value pixels in both IMERG and MRMS and Filtering Sensros
-            if nnn!=0 and nnn!=74:
+            if nnn!=0 and nnn!=152:
                 if IMEnp0[XX][YY]!=0 and MRMnp0[XX][YY]!=0 and SNnp0[XX][YY]==0 and SNnplast[XX][YY]==0 and SNnpfuture[XX][YY]==0:
                     IMEnpS0.append(IMEnp0[XX][YY])
                     MRMnpS0.append(MRMnp0[XX][YY])
-                    BiasIMS0.append(IMEnp0[XX][YY]-MRMnp0[XX][YY])   
+                    BiasIMS0.append(IMEnp0[XX][YY]-MRMnp0[XX][YY])  
+                    NEventS0.append(nnn)  
 
-                if nnn>1 and nnn<73:
+                if nnn>1 and nnn<151:
                 
                     #Filtering Zero-Value pixels in both IMERG and MRMS and Filtering Sensros
                     if IMEnp0[XX][YY] !=0 and MRMnp0[XX][YY]!=0 and SNnp0[XX][YY]==3:# and SNnplast[XX][YY]==0 and SNnpfuture[XX][YY]==0 and SNnplastlast[XX][YY]==0 and SNnpfuturefuture[XX][YY]==0:
                         IMEnpS3.append(IMEnp0[XX][YY])
                         MRMnpS3.append(MRMnp0[XX][YY])
                         BiasIMS3.append(IMEnp0[XX][YY]-MRMnp0[XX][YY])   
+                        NEventS3.append(nnn) 
 
                     
             
@@ -1146,6 +1159,7 @@ for nnn in range(len(IMERG)):
                         IMEnpS5.append(IMEnp0[XX][YY])
                         MRMnpS5.append(MRMnp0[XX][YY])
                         BiasIMS5.append(IMEnp0[XX][YY]-MRMnp0[XX][YY])  
+                        NEventS5.append(nnn) 
 
             
             
@@ -1154,6 +1168,7 @@ for nnn in range(len(IMERG)):
                         IMEnpS7.append(IMEnp0[XX][YY])
                         MRMnpS7.append(MRMnp0[XX][YY])
                         BiasIMS7.append(IMEnp0[XX][YY]-MRMnp0[XX][YY])   
+                        NEventS7.append(nnn) 
 
             
             
@@ -1162,7 +1177,8 @@ for nnn in range(len(IMERG)):
                     if IMEnp0[XX][YY] !=0 and MRMnp0[XX][YY]!=0 and SNnp0[XX][YY]==9:# and SNnplast[XX][YY]==0 and SNnpfuture[XX][YY]==0 and SNnplastlast[XX][YY]==0 and SNnpfuturefuture[XX][YY]==0:
                         IMEnpS9.append(IMEnp0[XX][YY])
                         MRMnpS9.append(MRMnp0[XX][YY])
-                        BiasIMS9.append(IMEnp0[XX][YY]-MRMnp0[XX][YY])   
+                        BiasIMS9.append(IMEnp0[XX][YY]-MRMnp0[XX][YY])  
+                        NEventS9.append(nnn) 
  
             
             
@@ -1171,14 +1187,24 @@ for nnn in range(len(IMERG)):
                         IMEnpS11.append(IMEnp0[XX][YY])
                         MRMnpS11.append(MRMnp0[XX][YY])
                         BiasIMS11.append(IMEnp0[XX][YY]-MRMnp0[XX][YY])  
+                        NEventS11.append(nnn) 
 
 
+                    #Filtering Zero-Value pixels in both IMERG and MRMS and Filtering Sensros
+                    if IMEnp0[XX][YY] !=0 and MRMnp0[XX][YY]!=0 and SNnp0[XX][YY]==20:# and SNnplast[XX][YY]==0 and SNnpfuture[XX][YY]==0 and SNnplastlast[XX][YY]==0 and SNnpfuturefuture[XX][YY]==0:
+                        IMEnpS20.append(IMEnp0[XX][YY])
+                        MRMnpS20.append(MRMnp0[XX][YY])
+                        BiasIMS20.append(IMEnp0[XX][YY]-MRMnp0[XX][YY])  
+                        NEventS20.append(nnn) 
+#
 IMEnpS.append(IMEnpS0)
 IMEnpS.append(IMEnpS3)
 IMEnpS.append(IMEnpS5)
 IMEnpS.append(IMEnpS7)
 IMEnpS.append(IMEnpS9)
 IMEnpS.append(IMEnpS11)
+IMEnpS.append(IMEnpS20)
+
 
 MRMnpS.append(MRMnpS0)
 MRMnpS.append(MRMnpS3)
@@ -1186,6 +1212,8 @@ MRMnpS.append(MRMnpS5)
 MRMnpS.append(MRMnpS7)
 MRMnpS.append(MRMnpS9)
 MRMnpS.append(MRMnpS11)
+MRMnpS.append(MRMnpS20)
+
 
 BiasIMS.append(BiasIMS0)
 BiasIMS.append(BiasIMS3)
@@ -1193,13 +1221,23 @@ BiasIMS.append(BiasIMS5)
 BiasIMS.append(BiasIMS7)
 BiasIMS.append(BiasIMS9)
 BiasIMS.append(BiasIMS11)
+BiasIMS.append(BiasIMS20)
+
+
+NEventS.append(list(set(NEventS0)))
+NEventS.append(list(set(NEventS3))) 
+NEventS.append(list(set(NEventS5))) 
+NEventS.append(list(set(NEventS7))) 
+NEventS.append(list(set(NEventS9))) 
+NEventS.append(list(set(NEventS11))) 
+NEventS.append(list(set(NEventS20))) 
 
 
 
-
-
-
-
+#
+##
+#
+#
 
 
 
@@ -1222,30 +1260,30 @@ BiasIMS.append(BiasIMS11)
 #plt.grid()
 #plt.tight_layout()  
 
-Sensorno=[0,3,5,7,9,11]
-title='PMW Raw Data All Domain Sensor No. '
-#############Scatterplotting for IMERG and MRMS
-#xmin=0
-#xmax=115
-#ymin=0
-#ymax=50
-#step=5
-#ylabel='IMERG Intensity (mm/hr)'
-#xlabel='MRMS Intensity (mm/hr)'
-#for pl in range(6):
-#    plt.subplot(2,3,pl+1)     
-#    plt.scatter(MRMnpS[pl],IMEnpS[pl],label='Sensor '+str(Sensorno[pl]))#, s=1)#, lw=3)
-#    plt.title(title+str(Sensorno[pl]))
-#    plt.legend(loc='upper right') 
-#    plt.ylabel(ylabel)# (IMERG-MRMS) (mm/hr)") 
-#    plt.xlabel(xlabel)  
-#    plt.axis('scaled')
-#    axes = plt.gca()
-#    axes.set_xlim([xmin,xmax])
-#    axes.set_ylim([ymin,ymax])
-#    plt.yticks(np.arange(ymin, ymax, step=step))  
-#    plt.xticks(np.arange(xmin, xmax, step=step))   
-#    plt.grid()
+Sensorno=[0,3,5,7,9,11,20]
+title='PMW Raw Data Hurricane Only Sensor No. '
+############Scatterplotting for IMERG and MRMS
+xmin=0
+xmax=115
+ymin=0
+ymax=50
+step=5
+ylabel='IMERG Intensity (mm/hr)'
+xlabel='MRMS Intensity (mm/hr)'
+for pl in range(6):
+    plt.subplot(2,3,pl+1)     
+    plt.scatter(MRMnpS[pl],IMEnpS[pl],label='Sensor '+str(Sensorno[pl])+" NE="+str(len(NEventS[pl])))#, s=1)#, lw=3)
+    plt.title(title+str(Sensorno[pl]))
+    plt.legend(loc='upper right') 
+    plt.ylabel(ylabel)# (IMERG-MRMS) (mm/hr)") 
+    plt.xlabel(xlabel)  
+    plt.axis('scaled')
+    axes = plt.gca()
+    axes.set_xlim([xmin,xmax])
+    axes.set_ylim([ymin,ymax])
+    plt.yticks(np.arange(ymin, ymax, step=step))  
+    plt.xticks(np.arange(xmin, xmax, step=step))   
+    plt.grid()
 #    
 
 ###############Scatter Plotting MRMS and Bias
@@ -1258,7 +1296,7 @@ title='PMW Raw Data All Domain Sensor No. '
 #xlabel='MRMS Intensity (mm/hr)'
 #for pl in range(6):
 #    plt.subplot(2,3,pl+1)     
-#    plt.scatter(MRMnpS[pl],BiasIMS[pl],label='Sensor '+str(Sensorno[pl]))#, s=1)#, lw=3)
+#    plt.scatter(MRMnpS[pl],BiasIMS[pl],label='Sensor '+str(Sensorno[pl])+" NE="+str(len(NEventS[pl])))#, s=1)#, lw=3)
 #    plt.title(title+str(Sensorno[pl]))
 #    plt.legend(loc='upper right') 
 #    plt.ylabel(ylabel)# (IMERG-MRMS) (mm/hr)") 
@@ -1284,7 +1322,7 @@ title='PMW Raw Data All Domain Sensor No. '
 #xlabel='IMERG Intensity (mm/hr)'
 #for pl in range(6):
 #    plt.subplot(2,3,pl+1)     
-#    plt.scatter(IMEnpS[pl],BiasIMS[pl],label='Sensor '+str(Sensorno[pl]))#, s=1)#, lw=3)
+#    plt.scatter(IMEnpS[pl],BiasIMS[pl],label='Sensor '+str(Sensorno[pl])+" NE="+str(len(NEventS[pl])))#, s=1)#, lw=3)
 #    plt.title(title+str(Sensorno[pl]))
 #    plt.legend(loc='upper right') 
 #    plt.ylabel(ylabel)# (IMERG-MRMS) (mm/hr)") 
@@ -1393,14 +1431,15 @@ title='PMW Raw Data All Domain Sensor No. '
 ##########Bias    
 #for pl in range(6):
 #    plt.subplot(2,3,pl+1) 
-#    plt.hist(BiasIMS[pl], bins=200, normed=True)
-#
+#    plt.hist(BiasIMS[0], bins=200, normed=True,label='IR, NE='+str(len(NEventS[0])),alpha=.4)
+#    plt.hist(BiasIMS[pl], bins=200, normed=True,label='PMW, NE='+str(len(NEventS[pl])),alpha=.4)
+#    plt.legend(loc='upper right')
 #    plt.xlabel('Bias IMERG-MRMS (mm/hr)')
 #    plt.ylabel('Percentile (0 to 1)')
 #    plt.title(title+str(Sensorno[pl]))
 #    plt.xticks(np.arange(-40, 60, step=10)) 
 #    plt.xlim([-40,60])
-#    
+    
 
 ##########MRMS and IMERG    
 #for pl in range(6):
@@ -1413,7 +1452,7 @@ title='PMW Raw Data All Domain Sensor No. '
 #    plt.title(title+str(Sensorno[pl]))
 #    plt.xticks(np.arange(0, 50, step=10)) 
 #    plt.xlim([0,50])
-#    
+    
 
 
 
@@ -1470,45 +1509,17 @@ title='PMW Raw Data All Domain Sensor No. '
     
 
 ################ MRMS IMERG
-xmin=0
-xmax=50
-ymin=0
-ymax=50
-
-ylabel='IMERG Intensity (mm/hr)'
-xlabel='MRMS Intensity (mm/hr)'
-plt.subplot(2,3,1)  
-plt.ylim([ymin,ymax])
-plt.xlim([xmin,xmax])
-for pl in range(1,6):
-    plt.subplot(2,3,pl+1)  
-    plt.hist2d(MRMnpS[pl], IMEnpS[pl], bins=int(np.max(MRMnpS[pl])/2), cmap='Reds', normed=True)
-
-    plt.title(title+str(Sensorno[pl]))
-    #plt.xticks(np.arange(-40, 60, step=10)) 
-    plt.axis('scaled')
-    plt.ylim([ymin,ymax])
-    plt.xlim([xmin,xmax])
-    plt.ylabel(ylabel)
-    plt.xlabel(xlabel)
-    cb = plt.colorbar()
-    cb.set_label('percentile 0 to 1')
-    
-    
-################# IMERG Bias
 #xmin=0
-#xmax=50
-#ymin=-20
-#ymax=50
+#xmax=5
+#ymin=0
+#ymax=5
 #
-#ylabel='Bias IMERG-MRMS (mm/hr)'
-#xlabel='IMERG Intensity (mm/hr)'
-#plt.subplot(2,3,1)  
-#plt.ylim([ymin,ymax])
-#plt.xlim([xmin,xmax])
-#for pl in range(1,6):
+#ylabel='IMERG Intensity (mm/hr)'
+#xlabel='MRMS Intensity (mm/hr)'
+#
+#for pl in range(6):
 #    plt.subplot(2,3,pl+1)  
-#    plt.hist2d(IMEnpS[pl], BiasIMS[pl], bins=int(np.max(IMEnpS[pl])/0.5), cmap='Reds', normed=True)
+#    plt.hist2d(MRMnpS[pl], IMEnpS[pl], bins=int(np.max(MRMnpS[pl])/0.2), cmap='Reds', normed=True)
 #
 #    plt.title(title+str(Sensorno[pl]))
 #    #plt.xticks(np.arange(-40, 60, step=10)) 
@@ -1518,7 +1529,31 @@ for pl in range(1,6):
 #    plt.ylabel(ylabel)
 #    plt.xlabel(xlabel)
 #    cb = plt.colorbar()
-#    cb.set_label('percentile 0 to 1')
+#    cb.set_label('percentile 0 to 1, NE='+str(len(NEventS[pl])))
+    
+    
+################# IMERG Bias
+#xmin=0
+#xmax=5
+#ymin=-3
+#ymax=5
+#
+#ylabel='Bias IMERG-MRMS (mm/hr)'
+#xlabel='IMERG Intensity (mm/hr)'
+#
+#for pl in range(6):
+#    plt.subplot(2,3,pl+1)  
+#    plt.hist2d(IMEnpS[pl], BiasIMS[pl], bins=int(np.max(IMEnpS[pl])/0.2), cmap='Reds', normed=True)
+#
+#    plt.title(title+str(Sensorno[pl]))
+#    #plt.xticks(np.arange(-40, 60, step=10)) 
+#    plt.axis('scaled')
+#    plt.ylim([ymin,ymax])
+#    plt.xlim([xmin,xmax])
+#    plt.ylabel(ylabel)
+#    plt.xlabel(xlabel)
+#    cb = plt.colorbar()
+#    cb.set_label('percentile 0 to 1, NE='+str(len(NEventS[pl])))
 
 ################# MRMS Bias
 #xmin=0
@@ -1528,10 +1563,8 @@ for pl in range(1,6):
 #
 #ylabel='Bias IMERG-MRMS (mm/hr)'
 #xlabel='MRMS Intensity (mm/hr)'
-#plt.subplot(2,3,1)  
-#plt.ylim([ymin,ymax])
-#plt.xlim([xmin,xmax])
-#for pl in range(1,6):
+
+#for pl in range(6):
 #    plt.subplot(2,3,pl+1)  
 #    plt.hist2d(MRMnpS[pl], BiasIMS[pl], bins=int(np.max(MRMnpS[pl])/0.5), cmap='Reds', normed=True)
 #
